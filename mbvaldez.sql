@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.5.2
+-- version 4.6.4
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: May 05, 2017 at 08:03 AM
--- Server version: 10.1.21-MariaDB
--- PHP Version: 7.1.1
+-- Host: 127.0.0.1
+-- Generation Time: May 22, 2017 at 03:50 AM
+-- Server version: 5.7.14
+-- PHP Version: 7.0.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -315,17 +315,15 @@ CREATE TABLE `inventory` (
 --
 
 INSERT INTO `inventory` (`inv_id`, `item_id`, `quantity`, `cost`, `trans_date`, `record_id`) VALUES
-(17, 1, 15000, '10.00', '2017-04-16', 14),
-(18, 1, -50, '10.00', '2017-04-16', 17),
-(19, 1, -50, '10.00', '2017-04-16', 18),
-(20, 1, -50, '10.00', '2017-04-16', 19),
-(21, 1, -3, '10.00', '2017-04-16', 20),
-(22, 1, -4, '10.00', '2017-04-16', 21),
-(23, 1, -1, '10.00', '2017-04-16', 22),
-(24, 1, -16, '10.00', '2017-04-16', 23),
-(25, 1, -80, '10.00', '2017-04-16', 26),
-(26, 1, 2, '10.00', '2017-04-16', 27),
-(27, 1, 4, '10.00', '2017-04-16', 28);
+(1, 1, 15000, '10.00', '2017-04-16', 14),
+(2, 2, 300, '205.00', '2017-05-02', 15),
+(3, 3, 500, '205.00', '2017-05-02', 16),
+(4, 4, 1000, '200.00', '2017-05-02', 17),
+(5, 5, 400, '200.00', '2017-05-02', 18),
+(6, 6, 400, '200.00', '2017-05-02', 19),
+(7, 7, 500, '200.00', '2017-05-02', 20),
+(8, 8, 474, '0.00', '2017-05-02', 21),
+(9, 9, 600, '12.00', '2017-05-02', 22);
 
 -- --------------------------------------------------------
 
@@ -517,8 +515,7 @@ CREATE TABLE `returns` (
 --
 
 INSERT INTO `returns` (`return_id`, `return_date`, `customer_id`, `total_amount`) VALUES
-(1, '2017-04-16', 3, '20.00'),
-(2, '2017-04-16', 3, '40.00');
+(15, '2017-05-22', 3, '0.00');
 
 -- --------------------------------------------------------
 
@@ -539,8 +536,7 @@ CREATE TABLE `return_items` (
 --
 
 INSERT INTO `return_items` (`ri_id`, `return_id`, `item_id`, `quantity`, `cost`) VALUES
-(2, 1, 1, 2, 10),
-(3, 2, 1, 4, 10);
+(16, 15, 8, 26, 0);
 
 -- --------------------------------------------------------
 
@@ -858,17 +854,17 @@ ALTER TABLE `banklist`
 -- AUTO_INCREMENT for table `cashflow`
 --
 ALTER TABLE `cashflow`
-  MODIFY `cf_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `cf_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `collections`
 --
 ALTER TABLE `collections`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `company_checks`
 --
 ALTER TABLE `company_checks`
-  MODIFY `cc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `cc_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `customers`
 --
@@ -898,7 +894,7 @@ ALTER TABLE `expense_items`
 -- AUTO_INCREMENT for table `inventory`
 --
 ALTER TABLE `inventory`
-  MODIFY `inv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `inv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 --
 -- AUTO_INCREMENT for table `items`
 --
@@ -928,12 +924,12 @@ ALTER TABLE `recording`
 -- AUTO_INCREMENT for table `returns`
 --
 ALTER TABLE `returns`
-  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 --
 -- AUTO_INCREMENT for table `return_items`
 --
 ALTER TABLE `return_items`
-  MODIFY `ri_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ri_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 --
 -- AUTO_INCREMENT for table `sales`
 --
