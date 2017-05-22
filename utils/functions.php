@@ -703,6 +703,21 @@ class adps_functions{
     }else return mysqli_insert_id($link);
 
   }
+
+  public function updateInventory($return_id,$item_id,$quantity,$amount){
+    $link = $this->connect();
+
+    $query=sprintf("UPDATE inventory
+                    SET quantity = quantity - '".mysqli_real_escape_string($link,$quantity)."'
+                    WHERE item_id = '".mysqli_real_escape_string($link,$item_id)."'
+                    and quantity > 0");
+
+    if (!mysqli_query($link, $query)) {
+        return mysqli_error($link);
+    }else return mysqli_insert_id($link);
+
+  }
+
   public function addSale($customer_id,$sale_date,$total_amount,$record_id,$discount){
     $link = $this->connect();
     $query=sprintf("INSERT INTO sales(customer_id,sale_date,total_amount,due_date,record_id,discount)

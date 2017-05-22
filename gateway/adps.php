@@ -136,6 +136,7 @@
 						for($i=0;$i<count($itemList);$i++){
 							$item_id = $db->addReturnItem($_POST['return_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 							$db->addInventory($itemList[$i][0],($itemList[$i][1]),$itemList[$i][2],date_create($_POST['return_date']),$record_id);
+							$db->updateInventory($_POST['return_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 						}
 						echo json_encode(array("status"=>"success","return_id"=>$return_id));
 					}

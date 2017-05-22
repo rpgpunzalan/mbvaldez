@@ -281,6 +281,7 @@
         success: function(data){
           console.log(data);
           if(data.status == "success"){
+            console.log("successful");
             window.location.replace("addReturn.php?addReturn=1");
           }else{
             // window.location.replace("addReturn.php?addReturn=0");
