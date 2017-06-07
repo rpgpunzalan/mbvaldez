@@ -301,9 +301,15 @@
 				break;
 			}
 			case "getInventoryReport":{
-		      	$res = $db->getInventoryReport();
-		      	$quantity = $db->getInventoryReportQuantity();
-		    	echo json_encode(array("status"=>"success","res"=>$res,"quantity"=>$quantity));
+				if(isset($_GET['d1'])&&isset($_GET['d2'])){
+		      		$res = $db->getInventoryReportQuantity($_GET['d1'],$_GET['d2']);
+		    	}
+		    	if($res){
+		    		$items = $db->getInventoryReportItems();
+					echo json_encode(array("status"=>"success","res"=>$res,"items"=>$items));
+				}else{
+					echo json_encode(array("status"=>"success","result"=>"empty"));
+				}
 				break;
 			}
 			case "getCashflowListByDate":{

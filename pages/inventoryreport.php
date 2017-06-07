@@ -53,12 +53,42 @@
     <div class="row">
       <!-- Left col -->
       <section class="col-md-12">
-          <table class="table" id="inventoryTable">
+        <?php
+
+        if(isset($_GET['d1'])&&isset($_GET['d2'])){
+
+        ?>
+          <input type="hidden" value="<?php echo $d1; ?>" id="startDate" />
+          <input type="hidden" value="<?php echo $d2; ?>" id="endDate" />
+        <?php
+        }
+        ?>
+        <div class="box box-success">
+          <div class="box-header with-border">
+            <div class="form-group">
+              <label>Date range:</label>
+
+              <div class="input-group">
+                <div class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </div>
+                <input type="text" class="form-control pull-right" id="dateRange">
+              </div>
+              <!-- /.input group -->
+            </div>
+            <button type="button" class="btn" onclick="myFunction()">Generate Inventory Report</button>
+          </div>
+
+          </div>
+          <div class="table-bordered">
+            <table class="table" id="inventoryTable">
             <thead>
               <tr>
                 <th>Item</th>
                 <th>Cost</th>
                 <th>Quantity</th>
+                <th>Total</th>
+                <th>Date</th>
               </tr>
             </thead>
             <tbody>
@@ -71,8 +101,15 @@
               <tr id="quantity">
                
               </tr>
+              <tr id="total">
+               
+              </tr>
+              <tr id="date">
+               
+              </tr>
             </tbody>
           </table>
+          </div>
         </div>
         <!-- /.nav-tabs-custom -->
 
@@ -86,30 +123,66 @@
 ?>
 <script>
 
+  var startDate,endDate,dataParam;
+
+    function myFunction() {
+
+    dataParam = {"d1":startDate,"d2":endDate};
+    //console.log(dataParam);
+       $.ajax({
+          url: '../gateway/adps.php?op=getInventoryReport',
+          type: 'get',
+          dataType: 'json',
+          data:dataParam,
+          success: function(data){
+
+            /*console.log(data.res[0].item_description);*/
+            console.log(data.res.length);
+
+            for(var i = data.items.length-1; i >= 0; i--){
+              var table = document.getElementById("inventoryTable");
+              var row = table.insertRow(1);
+              var cell1 = row.insertCell(0);
+              var cell2 = row.insertCell(1);
+              var cell3 = row.insertCell(2);
+             /* var cell4 = row.insertCell(3);
+              var cell5 = row.insertCell(4);*/
+              cell1.innerHTML = data.items[i].item_description;
+              cell2.innerHTML = "P " + data.items[i].cost;
+              /*if(data.items[i].item_id == data.res[i].item_id){
+                cell3.innerHTML = data.res[i].quantity; 
+              }else{
+                cell3.innerHTML = "P 0"; 
+              }
+              if(data.items[i].item_id == data.res[i].item_id){
+                cell4.innerHTML = "P " + data.res[i].quantity * data.res[i].cost;
+              }else{
+                cell3.innerHTML = "P 0"; 
+              }
+              cell5.innerHTML = data.res[i].trans_date; */  
+            }
+
+          }
+        });
+  }
+
   $(document).ready(function(){
 
-    $.ajax({
-      url: '../gateway/adps.php?op=getInventoryReport',
-      type: 'get',
-      dataType: 'json',
-      success: function(data){
+    if(typeof $('#startDate').val() != "undefined" && typeof $('#endDate').val()!="undefined"){
 
-        /*console.log(data.res[0].item_description);*/
-        console.log(data);
-
-        for(var i = 0; i < data.res.length; i++){
-          var table = document.getElementById("inventoryTable");
-          var row = table.insertRow(1);
-          var cell1 = row.insertCell(0);
-          var cell2 = row.insertCell(1);
-          var cell3 = row.insertCell(2);
-          cell1.innerHTML = data.res[i].item_description;
-          cell2.innerHTML = data.res[i].cost;
-          cell3.innerHTML = data.quantity[i].quantity;   
-        }
-
-      }
-    });
+      $('#dateRange').daterangepicker({format: 'MM/DD/YYYY',startDate: new Date($('#startDate').val()),endDate: new Date($('#endDate').val())},
+      function(start, end) {
+         startDate = start.format('YYYY-MM-DD');
+         endDate = end.format('YYYY-MM-DD');
+      });
+    }else {
+      $('#dateRange').daterangepicker({format: 'MM/DD/YYYY'},
+      function(start, end) {
+         startDate = start.format('YYYY-MM-DD');
+         endDate = end.format('YYYY-MM-DD');
+         /*console.log(startDate);*/
+      });
+    }
 
 
   });

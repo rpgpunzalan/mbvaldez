@@ -973,10 +973,14 @@ class adps_functions{
     return $data;
   }
 
-  public function getInventoryReportQuantity(){
+  public function getInventoryReportQuantity($d1, $d2){
     $link = $this->connect();
-    $query = "SELECT quantity
-            FROM inventory";
+    $query = "SELECT quantity,
+                    item_id,
+                    cost,
+                    trans_date
+            FROM inventory
+            WHERE trans_date BETWEEN '".$d1."' AND '".$d2."'";
     $result = mysqli_query ( $link, $query );
     $data = array();
    while($row =mysqli_fetch_assoc($result))
@@ -986,18 +990,19 @@ class adps_functions{
     return $data;
   }
 
-  public function getInventoryReport(){
-      $link = $this->connect();
-      $query = "SELECT item_description,
-                      cost
-              FROM items";
-      $result = mysqli_query ( $link, $query );
-      $data = array();
-     while($row =mysqli_fetch_assoc($result))
-      {
-         $data[] = $row;
-      }
-      return $data;
+  public function getInventoryReportItems(){
+    $link = $this->connect();
+    $query = "SELECT item_description,
+                    item_id,
+                    cost
+            FROM items";
+    $result = mysqli_query ( $link, $query );
+    $data = array();
+   while($row =mysqli_fetch_assoc($result))
+    {
+       $data[] = $row;
+    }
+    return $data;
   }
 
   public function getIncomeStatementSales($d1, $d2){
@@ -2130,7 +2135,7 @@ class ui_functions{
 			          <ul class="treeview-menu">
 			            <li><a href="sales.php"><i class="fa fa-circle-o"></i> Sales List</a></li>
 			            <li><a href="customers.php"><i class="fa fa-circle-o"></i> Customers</a></li>
-			            <li><a href="customerDeliverySheet.php"><i class="fa fa-circle-o"></i> Customer Delivery Sheet</a></li>
+			            
 			          </ul>
 		          </li>
 							';if($active==5) print'
