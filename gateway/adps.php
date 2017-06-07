@@ -300,6 +300,12 @@
 				}
 				break;
 			}
+			case "getInventoryReport":{
+		      	$res = $db->getInventoryReport();
+		      	$quantity = $db->getInventoryReportQuantity();
+		    	echo json_encode(array("status"=>"success","res"=>$res,"quantity"=>$quantity));
+				break;
+			}
 			case "getCashflowListByDate":{
 				if(isset($_GET['cf_date'])){;
 		      $res = $db->getCashflowListByDate($_GET['cf_date']);

@@ -27,12 +27,12 @@
   <!-- CONTENT HERE -->
   <!-- Main content -->
   <section class="content">
-    <div class="sk-folding-cube" id="loader">
+    <!-- <div class="sk-folding-cube" id="loader">
       <div class="sk-cube1 sk-cube"></div>
       <div class="sk-cube2 sk-cube"></div>
       <div class="sk-cube4 sk-cube"></div>
       <div class="sk-cube3 sk-cube"></div>
-    </div>
+    </div> -->
     <?php
       if(isset($_GET['recordPayment'])){
         if($_GET['recordPayment']==1){

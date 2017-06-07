@@ -973,6 +973,33 @@ class adps_functions{
     return $data;
   }
 
+  public function getInventoryReportQuantity(){
+    $link = $this->connect();
+    $query = "SELECT quantity
+            FROM inventory";
+    $result = mysqli_query ( $link, $query );
+    $data = array();
+   while($row =mysqli_fetch_assoc($result))
+    {
+       $data[] = $row;
+    }
+    return $data;
+  }
+
+  public function getInventoryReport(){
+      $link = $this->connect();
+      $query = "SELECT item_description,
+                      cost
+              FROM items";
+      $result = mysqli_query ( $link, $query );
+      $data = array();
+     while($row =mysqli_fetch_assoc($result))
+      {
+         $data[] = $row;
+      }
+      return $data;
+  }
+
   public function getIncomeStatementSales($d1, $d2){
       $link = $this->connect();
       $query = "SELECT total_amount,
@@ -2138,7 +2165,7 @@ class ui_functions{
 			          <ul class="treeview-menu">
 			            <li><a href="cashflow.php"><i class="fa fa-circle-o"></i> Cashflow</a></li>
 			            <li><a href="incomestatement.php"><i class="fa fa-circle-o"></i> Income Statement</a></li>
-			            <li><a href="report.php?rep=inventory"><i class="fa fa-circle-o"></i> Inventory Report</a></li>
+			            <li><a href="inventoryreport.php"><i class="fa fa-circle-o"></i> Inventory Report</a></li>
 			          </ul>
 		          </li>';
 							}
