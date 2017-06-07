@@ -273,6 +273,33 @@
 		    }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
 		    break;
 		  }
+			case "getIncomeStatement":{
+				if(isset($_GET['d1'])&&isset($_GET['d2'])){
+		      		$res = $db->getIncomeStatementSales($_GET['d1'],$_GET['d2']);
+		    	}
+		    	if($res){
+
+		    		$total_sales = 0;
+		    		$total_discount = 0;
+		    		$total_cost = 0;
+		    		$netsales = 0;
+
+		    		foreach($res as $sales){
+						$total_sales = $total_sales + $sales['total_amount'];
+						$total_discount = $total_discount + $sales['discount'];
+						$item_id = $db->getIncomeStatementSaleItem($sales['sale_id']);
+						$cost = $db->getIncomeStatementItems($item_id);
+						$total_cost = $total_cost + $cost;
+					}
+					$expenses = $db->getIncomeStatementExpenses();
+					$netsales = $total_sales - $total_discount;
+					//$total_cost = 0;
+					echo json_encode(array("status"=>"success","netsales"=>$netsales,"total_cost"=>$total_cost,"expenses"=>$expenses));
+				}else{
+					echo json_encode(array("status"=>"success","result"=>"empty"));
+				}
+				break;
+			}
 			case "getCashflowListByDate":{
 				if(isset($_GET['cf_date'])){;
 		      $res = $db->getCashflowListByDate($_GET['cf_date']);

@@ -973,6 +973,57 @@ class adps_functions{
     return $data;
   }
 
+  public function getIncomeStatementSales($d1, $d2){
+      $link = $this->connect();
+      $query = "SELECT total_amount,
+                      discount,
+                      sale_id
+              FROM sales
+              WHERE sale_date BETWEEN '".$d1."' AND '".$d2."'";
+      $result = mysqli_query ( $link, $query );
+      $data = array();
+     while($row =mysqli_fetch_assoc($result))
+      {
+         $data[] = $row;
+      }
+      return $data;
+  }
+
+  public function getIncomeStatementSaleItem($sale_id){
+      $link = $this->connect();
+      $query = "SELECT sale_id,
+                      item_id AS itemid
+              FROM sale_items
+               WHERE sale_id = '".$sale_id."'";
+      $result = mysqli_query ( $link, $query );
+      $row =mysqli_fetch_assoc($result);
+
+      return $row['itemid'];
+  }
+
+  public function getIncomeStatementItems($item_id){
+      $link = $this->connect();
+      $query = "SELECT item_id,
+                      cost AS cost
+              FROM items
+              WHERE item_id = '".$item_id."'";
+      $result = mysqli_query ( $link, $query );
+      $row =mysqli_fetch_assoc($result);
+
+      return $row['cost'];
+  }
+
+  public function getIncomeStatementExpenses(){
+      $link = $this->connect();
+      $query = "SELECT SUM(amount) AS total_amount
+              FROM expense_items";
+      $result = mysqli_query ( $link, $query );
+      $row =mysqli_fetch_assoc($result);
+
+      return $row['total_amount'];
+  }
+
+
   public function getCashflowList(){
     $link = $this->connect();
     $query = "SELECT sum(amount) as amount,
@@ -2086,7 +2137,7 @@ class ui_functions{
 			          </a>
 			          <ul class="treeview-menu">
 			            <li><a href="cashflow.php"><i class="fa fa-circle-o"></i> Cashflow</a></li>
-			            <li><a href="report.php?rep=income_statement"><i class="fa fa-circle-o"></i> Income Statement</a></li>
+			            <li><a href="incomestatement.php"><i class="fa fa-circle-o"></i> Income Statement</a></li>
 			            <li><a href="report.php?rep=inventory"><i class="fa fa-circle-o"></i> Inventory Report</a></li>
 			          </ul>
 		          </li>';
