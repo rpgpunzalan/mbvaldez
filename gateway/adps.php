@@ -300,6 +300,17 @@
 				}
 				break;
 			}
+			case "recordWithdraw":{
+				if(isset($_GET['d1'])&&isset($_GET['d2'])&&isset($_GET['d3'])){
+		      		$res = $db->recordWithdraw($_GET['d1'],$_GET['d2'],$_GET['d3']);
+		    	}
+		    	if($res){
+					echo json_encode(array("status"=>"success"));
+				}else{
+					echo json_encode(array("status"=>"success","result"=>"empty"));
+				}
+				break;
+			}
 			case "getInventoryReport":{
 				if(isset($_GET['d1'])&&isset($_GET['d2'])){
 		      		$res = $db->getInventoryReportQuantity($_GET['d1'],$_GET['d2']);
