@@ -137,29 +137,29 @@
           success: function(data){
 
             /*console.log(data.res[0].item_description);*/
-            console.log(data.res.length);
+            //console.log(data.items[0].item_description);
 
-            for(var i = data.items.length-1; i >= 0; i--){
+            for(var i = data.res.length-1; i >= 0; i--){
               var table = document.getElementById("inventoryTable");
               var row = table.insertRow(1);
               var cell1 = row.insertCell(0);
               var cell2 = row.insertCell(1);
               var cell3 = row.insertCell(2);
-             /* var cell4 = row.insertCell(3);
-              var cell5 = row.insertCell(4);*/
-              cell1.innerHTML = data.items[i].item_description;
-              cell2.innerHTML = "P " + data.items[i].cost;
-              /*if(data.items[i].item_id == data.res[i].item_id){
-                cell3.innerHTML = data.res[i].quantity; 
-              }else{
-                cell3.innerHTML = "P 0"; 
+              var cell4 = row.insertCell(3);
+              var cell5 = row.insertCell(4);
+             
+              
+              for(var j = 0; j < data.items.length; j++){
+                if(data.res[i].item_id == data.items[j].item_id){
+                  cell1.innerHTML = data.items[j].item_description;
+                }
               }
-              if(data.items[i].item_id == data.res[i].item_id){
-                cell4.innerHTML = "P " + data.res[i].quantity * data.res[i].cost;
-              }else{
-                cell3.innerHTML = "P 0"; 
-              }
-              cell5.innerHTML = data.res[i].trans_date; */  
+              cell2.innerHTML = data.res[i].cost; 
+              cell3.innerHTML = data.res[i].quantity; 
+              cell4.innerHTML = "P " + data.res[i].quantity * data.res[i].cost;
+              cell5.innerHTML = data.res[i].trans_date;
+
+              
             }
 
           }
