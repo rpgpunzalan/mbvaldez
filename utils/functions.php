@@ -292,12 +292,27 @@ class adps_functions{
     return $ret;
   }
 
+  /*public function recordDepositCheck($checknumber,$bankacct,$checkdate, $amount){
+    $link = $this->connect();
+    $query=sprintf("INSERT INTO company_checks(check_no,bank_account_id,check_date,amount)
+                    VALUES('".mysqli_real_escape_string($link,$checknumber)."',
+                          '".mysqli_real_escape_string($link,$bankacct)."',
+                          '".mysqli_real_escape_string($link,date_format($checkdate,"Y-m-d"))."',
+                          '".mysqli_real_escape_string($link,$amount)."')");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+  }*/
+
   public function addCompanyCheck($check_no,$bank_account_id,$check_date,$amount){
     $link = $this->connect();
     $query=sprintf("INSERT INTO company_checks(check_no,bank_account_id,check_date,amount)
                     VALUES('".mysqli_real_escape_string($link,$check_no)."',
                           '".mysqli_real_escape_string($link,$bank_account_id)."',
-                          '".mysqli_real_escape_string($link,date_format($check_date,"Y-m-d"))."',
+                          '".mysqli_real_escape_string($link,$check_date)."',
                           '".mysqli_real_escape_string($link,$amount)."')");
 
     if (!mysqli_query($link, $query)) {

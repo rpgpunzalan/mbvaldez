@@ -312,13 +312,14 @@
 				break;
 			}
 			case "recordDeposit":{
-				if(isset($_GET['d1'])&&isset($_GET['d2'])&&isset($_GET['d3'])){
-		      		$res = $db->recordDeposit($_GET['d1'],$_GET['d2'],$_GET['d3']);
+				if(isset($_GET['dateDeposit'])&&isset($_GET['bankacctDeposit'])&&isset($_GET['amountDeposit'])&&isset($_GET['checknumber'])&&isset($_GET['checkdate'])){
+		      		$res = $db->recordDeposit($_GET['dateDeposit'],$_GET['bankacctDeposit'],$_GET['amountDeposit']);
+		      		$res2 = $db->addCompanyCheck($_GET['checknumber'],$_GET['bankacctDeposit'],$_GET['checkdate'],$_GET['amountDeposit']);
 		    	}
-		    	if($res){
-					echo json_encode(array("status"=>"success"));
+		    	if($res2){
+					echo json_encode(array("status"=>"success", "res2"=>$res2));
 				}else{
-					echo json_encode(array("status"=>"success","result"=>"empty"));
+					echo json_encode(array("status"=>"success","res2"=>$res2));
 				}
 				break;
 			}

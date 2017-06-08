@@ -96,7 +96,7 @@
           <label for="amountDeposit">Amount:</label>
           <input type="text" class="form-control" id="amountDeposit">
         </div>
-        <button class="btn btn-default" onclick="recordDeposit()">Submit</button>
+        <input type="button" class="btn btn-primary btnSeccion" id="submitDeposit" value="Submit" onclick="recordDeposit()"/>
       </form>
     </div>
 
@@ -137,7 +137,18 @@
   function recordDeposit() {
     if($('#checkForm').css('display') == 'block')
     {
-        //do something
+        dataParam = {"dateDeposit":$("#dateDeposit").val(),"bankacctDeposit":$("#bankacctDeposit").val().trim(),"amountDeposit":$("#amountDeposit").val().trim(),"checknumber":$("#checknumber").val().trim(),"checkdate":$("#checkdate").val()};
+        console.log(dataParam);
+        $.ajax({
+          url: '../gateway/adps.php?op=recordDeposit',
+          type: 'get',
+          dataType: 'json',
+          data:dataParam,
+          success: function(data){
+            console.log("Success")
+          }
+        });
+        /*console.log($("#checkdate").val());*/
     }
     else
     {
@@ -209,7 +220,7 @@
       var date_input=$('input[name="date"]'); //our date input has the name "date"
       var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
       var options={
-        format: 'mm/dd/yyyy',
+        format: 'yyyy/mm/dd',
         container: container,
         todayHighlight: true,
         autoclose: true,
