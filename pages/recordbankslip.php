@@ -134,6 +134,33 @@
 ?>
 <script>
 
+  function recordDeposit() {
+    if($('#checkForm').css('display') == 'block')
+    {
+        //do something
+    }
+    else
+    {
+         dataParam = {"d1":$("#dateDeposit").val(),"d2":$("#bankacctDeposit").val().trim(),"d3":$("#amountDeposit").val().trim()};
+        console.log(dataParam);
+        $.ajax({
+          url: '../gateway/adps.php?op=recordDeposit',
+          type: 'get',
+          dataType: 'json',
+          data:dataParam,
+          success: function(data){
+
+            /*console.log(data.res[0].item_description);*/
+            //console.log(data.items[0].item_description);
+
+            console.log("Success");
+
+          }
+        });
+    }
+    
+  }
+
   function recordWithdraw() {
      dataParam = {"d1":$("#dateWithdraw").val(),"d2":$("#bankacctWithdraw").val().trim(),"d3":$("#amountWithdraw").val().trim()};
     console.log(dataParam);

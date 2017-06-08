@@ -279,6 +279,19 @@ class adps_functions{
     return $ret;
   }
 
+  public function recordDeposit($d1,$d2,$d3){
+    $link = $this->connect();
+    $query=sprintf("UPDATE bank_accounts
+                    SET current_balance = current_balance + '".mysqli_real_escape_string($link,$d3)."'
+                    WHERE account_number = '".mysqli_real_escape_string($link,$d2)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+  }
+
   public function addCompanyCheck($check_no,$bank_account_id,$check_date,$amount){
     $link = $this->connect();
     $query=sprintf("INSERT INTO company_checks(check_no,bank_account_id,check_date,amount)
