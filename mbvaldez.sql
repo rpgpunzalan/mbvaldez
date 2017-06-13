@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 22, 2017 at 03:50 AM
+-- Generation Time: Jun 13, 2017 at 04:33 AM
 -- Server version: 5.7.14
 -- PHP Version: 7.0.10
 
@@ -122,6 +122,13 @@ CREATE TABLE `bank_accounts` (
   `current_balance` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `bank_accounts`
+--
+
+INSERT INTO `bank_accounts` (`account_number`, `bank_id`, `branch`, `initial_balance`, `current_balance`) VALUES
+('12345', 1, 'Mandaluyong', '500.00', '4450.00');
+
 -- --------------------------------------------------------
 
 --
@@ -161,9 +168,16 @@ CREATE TABLE `company_checks` (
   `cc_id` int(11) NOT NULL,
   `check_no` varchar(15) NOT NULL,
   `bank_account_id` varchar(20) NOT NULL,
-  `check_date` date NOT NULL,
+  `check_date` date DEFAULT NULL,
   `amount` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `company_checks`
+--
+
+INSERT INTO `company_checks` (`cc_id`, `check_no`, `bank_account_id`, `check_date`, `amount`) VALUES
+(3, '1234567890', '12345', '2017-06-20', '50.00');
 
 -- --------------------------------------------------------
 
@@ -285,15 +299,15 @@ CREATE TABLE `expense_items` (
 --
 
 INSERT INTO `expense_items` (`ei_id`, `expense_id`, `particulars`, `amount`) VALUES
-(1, 0, 'System', '1000000.00'),
-(2, 2, 'System', '99999999.99'),
-(3, 3, 'Rainier', '5000.00'),
-(4, 3, 'Paolo', '4600.00'),
-(5, 4, 'R123', '5049.00'),
-(6, 4, 'P321', '6839.00'),
-(7, 10, 'Something', '500.00'),
-(8, 10, 'Hi there', '300.00'),
-(9, 11, 'Discount for Sale Number 14', '100.00');
+(1, 0, 'System', '50.00'),
+(2, 2, 'System', '30.00'),
+(3, 3, 'Rainier', '400.00'),
+(4, 3, 'Paolo', '205.00'),
+(5, 4, 'R123', '40.00'),
+(6, 4, 'P321', '15.00'),
+(7, 10, 'Something', '10.00'),
+(8, 10, 'Hi there', '5.00'),
+(9, 11, 'Discount for Sale Number 14', '1.00');
 
 -- --------------------------------------------------------
 
@@ -510,12 +524,29 @@ CREATE TABLE `returns` (
   `total_amount` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `returns`
+-- Table structure for table `return_empty`
 --
 
-INSERT INTO `returns` (`return_id`, `return_date`, `customer_id`, `total_amount`) VALUES
-(15, '2017-05-22', 3, '0.00');
+CREATE TABLE `return_empty` (
+  `empty_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `num_bottle` int(11) NOT NULL,
+  `num_case` int(11) NOT NULL,
+  `return_date` date NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `return_empty`
+--
+
+INSERT INTO `return_empty` (`empty_id`, `item_id`, `customer_id`, `num_bottle`, `num_case`, `return_date`) VALUES
+(16, 5, 3, 5, 6, '2017-06-13'),
+(15, 4, 3, 3, 4, '2017-06-13'),
+(14, 8, 3, 1, 2, '2017-06-13');
 
 -- --------------------------------------------------------
 
@@ -795,6 +826,12 @@ ALTER TABLE `returns`
   ADD PRIMARY KEY (`return_id`);
 
 --
+-- Indexes for table `return_empty`
+--
+ALTER TABLE `return_empty`
+  ADD PRIMARY KEY (`empty_id`);
+
+--
 -- Indexes for table `return_items`
 --
 ALTER TABLE `return_items`
@@ -864,7 +901,7 @@ ALTER TABLE `collections`
 -- AUTO_INCREMENT for table `company_checks`
 --
 ALTER TABLE `company_checks`
-  MODIFY `cc_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `cc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `customers`
 --
@@ -894,7 +931,7 @@ ALTER TABLE `expense_items`
 -- AUTO_INCREMENT for table `inventory`
 --
 ALTER TABLE `inventory`
-  MODIFY `inv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `inv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT for table `items`
 --
@@ -925,6 +962,11 @@ ALTER TABLE `recording`
 --
 ALTER TABLE `returns`
   MODIFY `return_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+--
+-- AUTO_INCREMENT for table `return_empty`
+--
+ALTER TABLE `return_empty`
+  MODIFY `empty_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 --
 -- AUTO_INCREMENT for table `return_items`
 --

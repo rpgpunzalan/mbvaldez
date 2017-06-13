@@ -145,6 +145,21 @@
         break;
       }
 
+      	case "addReturnEmpty":{
+
+        if(isset($_POST['return_date'])&&isset($_POST['itemList'])){
+          
+			$itemList = $_POST['itemList'];
+			for($i=0;$i<count($itemList);$i++){
+				$return_id = $db->addReturnEmpty($_POST['return_id'],$itemList[$i][0],$_POST['customer_id'],$itemList[$i][1],$itemList[$i][2],$_POST['return_date']);
+			}
+			echo json_encode(array("status"=>"success"));
+
+          //else echo json_encode(array("status"=>"failed", "message"=>$return_id));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
       case "addPurchaseOrder":{
 
         if(isset($_POST['po_id'])&&isset($_POST['po_date'])&&isset($_POST['total_amount'])&&isset($_POST['itemList'])&&isset($_POST['discount'])){

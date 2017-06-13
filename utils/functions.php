@@ -731,6 +731,22 @@ class adps_functions{
     }else return mysqli_insert_id($link);
 
   }
+
+  public function addReturnEmpty($return_id,$item_id,$customer_id,$num_bottle,$num_case,$return_date){
+    $link = $this->connect();
+    $query=sprintf("INSERT INTO return_empty(item_id,customer_id,num_bottle,num_case,return_date)
+                    VALUES('".mysqli_real_escape_string($link,$item_id)."',
+                          '".mysqli_real_escape_string($link,$customer_id)."',
+                          '".mysqli_real_escape_string($link,$num_bottle)."',
+                          '".mysqli_real_escape_string($link,$num_case)."',
+                          '".mysqli_real_escape_string($link,$return_date)."')");
+
+    if (!mysqli_query($link, $query)) {
+        return mysqli_error($link);
+    }else return mysqli_insert_id($link);
+
+  }
+
 	public function addReturnItem($return_id,$item_id,$quantity,$amount){
     $link = $this->connect();
     $query=sprintf("INSERT INTO return_items(return_id,item_id,quantity,cost)
@@ -2221,6 +2237,14 @@ class ui_functions{
               print'
                 <a href="recordbankslip.php">
                   <i class="fa fa-bank"></i> <span>Record Bank Slip</span>
+                </a>
+              </li>';
+              '';if($active==9) print'
+              <li class="active">';
+              else print '<li>';
+              print'
+                <a href="returnempties.php">
+                  <i class="fa fa-mail-reply-all"></i> <span>Record Empties</span>
                 </a>
               </li>
 		        </ul>
