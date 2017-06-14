@@ -103,14 +103,6 @@
                   <th scope="row">Expenses</th>
 
                 </tr>
-                <tr id="operating_income">
-                  <th scope="row"><u>Operating Income</u></th>
-
-                </tr>
-                <tr id="non_operating_income">
-                  <th scope="row">Non Operating Income</th>
-
-                </tr>
                 <tr id="net_income">
                   <th scope="row"><u>Net Income</u></th>
 
@@ -133,7 +125,7 @@
 
   var startDate,endDate,dataParam;
 
-  var netsales, cost, grossprofit, expenses, operating_income, non_operating_income = 0, net_income;
+  var netsales, cost, grossprofit, expenses, operating_income, net_income;
 
   function myFunction() {
 
@@ -165,8 +157,7 @@
         }
 
         grossprofit = netsales - cost;
-        operating_income = grossprofit - expenses;
-        net_income = operating_income + non_operating_income;
+        net_income = grossprofit - expenses;
         
         var row = document.getElementById("monthyear");
         var x = row.insertCell(1);
@@ -187,14 +178,6 @@
         var row = document.getElementById("expenses");
         var x = row.insertCell(1);
         x.innerHTML = "P " + expenses;
-
-        var row = document.getElementById("operating_income");
-        var x = row.insertCell(1);
-        x.innerHTML = "P " + operating_income;
-
-        var row = document.getElementById("non_operating_income");
-        var x = row.insertCell(1);
-        x.innerHTML = "P " + non_operating_income;
 
         var row = document.getElementById("net_income");
         var x = row.insertCell(1);
