@@ -152,6 +152,7 @@
 			$itemList = $_POST['itemList'];
 			for($i=0;$i<count($itemList);$i++){
 				$return_id = $db->addReturnEmpty($_POST['return_id'],$itemList[$i][0],$_POST['customer_id'],$itemList[$i][1],$itemList[$i][2],$_POST['return_date']);
+				$empty_id = $db->addInventoryEmpty($_POST['return_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 			}
 			echo json_encode(array("status"=>"success"));
 

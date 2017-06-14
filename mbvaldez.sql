@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 13, 2017 at 04:33 AM
+-- Generation Time: Jun 14, 2017 at 05:56 AM
 -- Server version: 5.7.14
 -- PHP Version: 7.0.10
 
@@ -342,6 +342,34 @@ INSERT INTO `inventory` (`inv_id`, `item_id`, `quantity`, `cost`, `trans_date`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `inventory_empty`
+--
+
+CREATE TABLE `inventory_empty` (
+  `inv_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `empty_bottle` int(11) NOT NULL,
+  `empty_case` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `inventory_empty`
+--
+
+INSERT INTO `inventory_empty` (`inv_id`, `item_id`, `empty_bottle`, `empty_case`) VALUES
+(1, 1, 0, 0),
+(2, 2, 0, 0),
+(3, 3, 0, 0),
+(4, 4, 0, 0),
+(5, 5, 0, 0),
+(6, 6, 0, 0),
+(7, 7, 0, 0),
+(8, 8, 0, 0),
+(9, 9, 0, 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `items`
 --
 
@@ -538,15 +566,6 @@ CREATE TABLE `return_empty` (
   `num_case` int(11) NOT NULL,
   `return_date` date NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `return_empty`
---
-
-INSERT INTO `return_empty` (`empty_id`, `item_id`, `customer_id`, `num_bottle`, `num_case`, `return_date`) VALUES
-(16, 5, 3, 5, 6, '2017-06-13'),
-(15, 4, 3, 3, 4, '2017-06-13'),
-(14, 8, 3, 1, 2, '2017-06-13');
 
 -- --------------------------------------------------------
 
@@ -784,6 +803,12 @@ ALTER TABLE `inventory`
   ADD PRIMARY KEY (`inv_id`);
 
 --
+-- Indexes for table `inventory_empty`
+--
+ALTER TABLE `inventory_empty`
+  ADD PRIMARY KEY (`inv_id`);
+
+--
 -- Indexes for table `items`
 --
 ALTER TABLE `items`
@@ -933,6 +958,11 @@ ALTER TABLE `expense_items`
 ALTER TABLE `inventory`
   MODIFY `inv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
+-- AUTO_INCREMENT for table `inventory_empty`
+--
+ALTER TABLE `inventory_empty`
+  MODIFY `inv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+--
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
@@ -966,7 +996,7 @@ ALTER TABLE `returns`
 -- AUTO_INCREMENT for table `return_empty`
 --
 ALTER TABLE `return_empty`
-  MODIFY `empty_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `empty_id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `return_items`
 --

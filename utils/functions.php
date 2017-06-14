@@ -747,6 +747,19 @@ class adps_functions{
 
   }
 
+  public function addInventoryEmpty($return_id,$item_id,$num_bottle,$num_case){
+    $link = $this->connect();
+    $query=sprintf("UPDATE inventory_empty
+        SET empty_bottle = empty_bottle + '".mysqli_real_escape_string($link,$num_bottle)."',
+        empty_case = empty_case + '".mysqli_real_escape_string($link,$num_case)."'
+        WHERE item_id = '".mysqli_real_escape_string($link,$item_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        return mysqli_error($link);
+    }else return mysqli_insert_id($link);
+
+  }
+
 	public function addReturnItem($return_id,$item_id,$quantity,$amount){
     $link = $this->connect();
     $query=sprintf("INSERT INTO return_items(return_id,item_id,quantity,cost)
@@ -2241,7 +2254,9 @@ class ui_functions{
 									<i class="fa fa-credit-card"></i> <span>Expenses</span>
 								</a>
 		          </li>
+
 							';
+
 							if($_SESSION['access_level']>7){
 							if($active==7) print'
 		          <li class="active treeview">';

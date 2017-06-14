@@ -17,7 +17,7 @@
 <div class="wrapper">
 
   <?php
-    $ui->showHeader(7);
+    $ui->showHeader(8);
   ?>
   <section class="content-header">
     <h1>

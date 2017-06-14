@@ -13,7 +13,7 @@
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
 
-  <?php $ui->showHeader(5); ?>
+  <?php $ui->showHeader(9); ?>
     <section class="content-header">
       <h1>
         Return Empty
