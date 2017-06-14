@@ -146,10 +146,25 @@
       data:dataParam,
       success: function(data){
 
-        netsales = data.netsales;
-        cost = data.total_cost;
+        if(data.netsales == null){
+          netsales = 0;
+        }else{
+          netsales = data.netsales;
+        }
+
+        if(data.cost == null){
+          cost = 0;
+        }else{
+          cost = data.cost;
+        }
+
+        if(data.expenses == null){
+          expenses = 0;
+        }else{
+          expenses = data.expenses;
+        }
+
         grossprofit = netsales - cost;
-        expenses = data.expenses;
         operating_income = grossprofit - expenses;
         net_income = operating_income + non_operating_income;
         

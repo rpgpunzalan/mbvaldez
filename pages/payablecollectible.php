@@ -130,17 +130,25 @@
 
             console.log(data);
 
+            var table = document.getElementById("payablecollectibleTable");
+            var row = table.insertRow(1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
 
-              var table = document.getElementById("payablecollectibleTable");
-              var row = table.insertRow(1);
-              var cell1 = row.insertCell(0);
-              var cell2 = row.insertCell(1);
-              var cell3 = row.insertCell(2);
-
+            if(data.payables == null){
+              cell1.innerHTML = "P 0"; 
+            }else{
               cell1.innerHTML = "P " + data.payables; 
-              cell2.innerHTML = "P " + data.collectibles; 
-              cell3.innerHTML = startDate + " to " + endDate;
+            }
 
+            if(data.collectibles == null){
+              cell2.innerHTML = "P 0"; 
+            }else{
+              cell2.innerHTML = "P " + data.collectibles; 
+            }
+
+            cell3.innerHTML = startDate + " to " + endDate;
           }
         });
   }
