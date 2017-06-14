@@ -97,9 +97,18 @@ session_start();
           var cell2 = row.insertCell(1);
           var cell3 = row.insertCell(2);
 
-          cell1.innerHTML = "P " + data.payables; 
-          cell2.innerHTML = "P " + data.collectibles; 
-          cell3.innerHTML = startDate + " to " + endDate;
+          if(data.payables == null){
+            cell1.innerHTML = "P 0"; 
+          }else{
+            cell1.innerHTML = "P " + data.payables; 
+          }
+
+          if(data.collectibles == null){
+            cell2.innerHTML = "P 0"; 
+          }else{
+            cell2.innerHTML = "P " + data.collectibles; 
+          }
+          cell3.innerHTML = data.startDate + " to " + data.endDate;
 
       }
     });

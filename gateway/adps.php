@@ -379,6 +379,32 @@
 				}
 				break;
 			}
+			case "getWeeklyPayableCollectibleReport":{
+				$monday = date( 'Y-m-d', strtotime( 'monday this week' ) );
+				$sunday = date( 'Y-m-d', strtotime( 'sunday this week' ) );
+	      		$payables = $db->getPayableReport($monday,$sunday);
+	      		$collectibles = $db->getCollectibleReport($monday,$sunday);
+	      		if($payables && $collectibles){
+
+		    		$total_payable = 0;
+		    		$total_collectible = 0;
+
+		    		foreach($payables as $payable){
+						$total = $payable['total_amount'] - $payable['amount_paid'];
+						$total_payable = $total_payable + $total;
+					}
+
+					foreach($collectibles as $collectible){
+						$total = $collectible['total_amount'] - $collectible['amount_paid'];
+						$total_collectible = $total_collectible + $total;
+					}
+
+					echo json_encode(array("status"=>"success","payables"=>$total_payable,"collectibles"=>$total_collectible,"startDate"=>$monday,"endDate"=>$sunday));
+				}else{
+					echo json_encode(array("status"=>"success","result"=>"empty","startDate"=>$monday,"endDate"=>$sunday));
+				}
+				break;
+			}
 			case "getCashflowListByDate":{
 				if(isset($_GET['cf_date'])){;
 		      $res = $db->getCashflowListByDate($_GET['cf_date']);
