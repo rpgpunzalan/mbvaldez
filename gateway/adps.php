@@ -350,6 +350,35 @@
 				}
 				break;
 			}
+			case "getPayableCollectibleReport":{
+				if(isset($_GET['d1'])&&isset($_GET['d2'])){
+		      		$payables = $db->getPayableReport($_GET['d1'],$_GET['d2']);
+		      		$collectibles = $db->getCollectibleReport($_GET['d1'],$_GET['d2']);
+		      		if($payables && $collectibles){
+
+			    		$total_payable = 0;
+			    		$total_collectible = 0;
+
+			    		foreach($payables as $payable){
+							$total = $payable['total_amount'] - $payable['amount_paid'];
+							$total_payable = $total_payable + $total;
+						}
+
+						foreach($collectibles as $collectible){
+							$total = $collectible['total_amount'] - $collectible['amount_paid'];
+							$total_collectible = $total_collectible + $total;
+						}
+
+						echo json_encode(array("status"=>"success","payables"=>$total_payable,"collectibles"=>$total_collectible));
+					}else{
+						echo json_encode(array("status"=>"success","result"=>"empty"));
+					}
+
+		    	}else{
+					echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+				}
+				break;
+			}
 			case "getCashflowListByDate":{
 				if(isset($_GET['cf_date'])){;
 		      $res = $db->getCashflowListByDate($_GET['cf_date']);

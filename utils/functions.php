@@ -1062,6 +1062,36 @@ class adps_functions{
     return $data;
   }
 
+  public function getPayableReport($d1, $d2){
+    $link = $this->connect();
+    $query = "SELECT total_amount,
+                    amount_paid
+            FROM purchase_orders
+            WHERE po_date BETWEEN '".$d1."' AND '".$d2."'";
+    $result = mysqli_query ( $link, $query );
+    $data = array();
+   while($row =mysqli_fetch_assoc($result))
+    {
+       $data[] = $row;
+    }
+    return $data;
+  }
+
+  public function getCollectibleReport($d1, $d2){
+    $link = $this->connect();
+    $query = "SELECT total_amount,
+                    amount_paid
+            FROM sales
+            WHERE sale_date BETWEEN '".$d1."' AND '".$d2."'";
+    $result = mysqli_query ( $link, $query );
+    $data = array();
+   while($row =mysqli_fetch_assoc($result))
+    {
+       $data[] = $row;
+    }
+    return $data;
+  }
+
   public function getIncomeStatementSales($d1, $d2){
       $link = $this->connect();
       $query = "SELECT total_amount,
@@ -2228,6 +2258,7 @@ class ui_functions{
 			            <li><a href="cashflow.php"><i class="fa fa-circle-o"></i> Cashflow</a></li>
 			            <li><a href="incomestatement.php"><i class="fa fa-circle-o"></i> Income Statement</a></li>
 			            <li><a href="inventoryreport.php"><i class="fa fa-circle-o"></i> Inventory Report</a></li>
+                  <li><a href="payablecollectible.php"><i class="fa fa-circle-o"></i> Payables and Collectibles</a></li>
 			          </ul>
 		          </li>';
 							}
