@@ -1080,7 +1080,7 @@ class adps_functions{
     $query = "SELECT total_amount,
                     amount_paid
             FROM purchase_orders
-            WHERE po_date BETWEEN '".$d1."' AND '".$d2."'";
+            WHERE due_date BETWEEN '".$d1."' AND '".$d2."'";
     $result = mysqli_query ( $link, $query );
     $data = array();
    while($row =mysqli_fetch_assoc($result))
@@ -1095,7 +1095,7 @@ class adps_functions{
     $query = "SELECT total_amount,
                     amount_paid
             FROM sales
-            WHERE sale_date BETWEEN '".$d1."' AND '".$d2."'";
+            WHERE due_date BETWEEN '".$d1."' AND '".$d2."'";
     $result = mysqli_query ( $link, $query );
     $data = array();
    while($row =mysqli_fetch_assoc($result))
