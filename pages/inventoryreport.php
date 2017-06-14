@@ -92,21 +92,6 @@
               </tr>
             </thead>
             <tbody>
-              <tr id="item">
-                
-              </tr>
-              <tr id="cost">
-                
-              </tr>
-              <tr id="quantity">
-               
-              </tr>
-              <tr id="total">
-               
-              </tr>
-              <tr id="date">
-               
-              </tr>
             </tbody>
           </table>
           </div>
@@ -138,6 +123,10 @@
 
             /*console.log(data.res[0].item_description);*/
             //console.log(data.items[0].item_description);
+
+            $('#inventoryTable tr').not(function(){ return !!$(this).has('th').length; }).remove();
+
+            console.log("hello");
 
             for(var i = data.res.length-1; i >= 0; i--){
               var table = document.getElementById("inventoryTable");
