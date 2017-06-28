@@ -5,6 +5,7 @@
   if(isset($_GET['customer_id'])){
     $customer_id = $_GET['customer_id'];
   }
+  $db = new adps_functions();
 ?>
 
 <!DOCTYPE html>
@@ -56,20 +57,26 @@
 
                 <div class="box box-primary">
                   <div class="box-header with-border">
-                    <h6 class="box-title">Payables</h6>
+                    <h6 class="box-title">Collectibles</h6>
 
                   </div>
                   <div class="box-body" id="vitalsHistory">
-
+                    <table class="table table-bordered">
+                      <thead>
+                        <th>Date</th>
+                        <th>Due Date</th>
+                      </thead>
+                      <?php $db->getCustomerCollectibles($customer_id); ?>
+                    </table>
                   </div>
                 </div>
 
-                <div class="box box-primary">
+                <!-- <div class="box box-primary">
                   <div class="box-header with-border">
                     <h6 class="box-title">Transaction History</h6>
 
                   </div>
-                </div>
+                </div> -->
 
 
               </div>

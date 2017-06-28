@@ -61,10 +61,18 @@
                       </select>
                     </div>
                   </div> -->
-  			        	<div class="form-group col-md-8">
+                  <div class="form-group col-md-4">
                     <div class="input-group date">
                       <div class="input-group-addon">
-                        OCS Number
+                        Shipment Number
+                      </div>
+                      <input type="text" class="form-control" id="shipment_no" value="" />
+                    </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <div class="input-group date">
+                      <div class="input-group-addon">
+                        Invoice Number
                       </div>
                       <input type="text" class="form-control" id="po_id" value="" />
                     </div>
@@ -267,6 +275,7 @@
         type: 'post',
         dataType: 'json',
         data: {'user_id':1,
+        		'shipment_no':$('#shipment_no').val(),
         		'po_id':$('#po_id').val(),
         		'po_date':$('#po_date').val(),
         		'total_amount':$('#total_amount').val(),

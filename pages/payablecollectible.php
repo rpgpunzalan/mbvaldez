@@ -7,6 +7,7 @@
     $d1 = $_GET['d1'];
     $d2 = $_GET['d2'];
   }
+  $db = new adps_functions();
 ?>
 <!DOCTYPE html>
 <html>
@@ -27,12 +28,12 @@
   <!-- CONTENT HERE -->
   <!-- Main content -->
   <section class="content">
-    <!-- <div class="sk-folding-cube" id="loader">
+    <div class="sk-folding-cube" id="loader">
       <div class="sk-cube1 sk-cube"></div>
       <div class="sk-cube2 sk-cube"></div>
       <div class="sk-cube4 sk-cube"></div>
       <div class="sk-cube3 sk-cube"></div>
-    </div> -->
+    </div>
     <?php
       if(isset($_GET['recordPayment'])){
         if($_GET['recordPayment']==1){
@@ -52,61 +53,64 @@
     <!-- Main row -->
     <div class="row">
       <!-- Left col -->
-      <section class="col-md-12">
-        <?php
-
-        if(isset($_GET['d1'])&&isset($_GET['d2'])){
-
-        ?>
-          <input type="hidden" value="<?php echo $d1; ?>" id="startDate" />
-          <input type="hidden" value="<?php echo $d2; ?>" id="endDate" />
-        <?php
-        }
-        ?>
-        <div class="box box-success">
-          <div class="box-header with-border">
-            <div class="form-group">
-              <label>Date range:</label>
-
-              <div class="input-group">
-                <div class="input-group-addon">
-                  <i class="fa fa-calendar"></i>
-                </div>
-                <input type="text" class="form-control pull-right" id="dateRange">
-              </div>
-              <!-- /.input group -->
-            </div>
-            <button type="button" class="btn" onclick="myFunction()">Generate Payable and Collectible Report</button>
-          </div>
-
-          </div>
-          <div class="table-bordered">
-            <table class="table" id="payablecollectibleTable">
-            <thead>
-              <tr>
-                <th>Payables</th>
-                <th>Collectibles</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr id="item">
-                
-              </tr>
-              <tr id="cost">
-                
-              </tr>
-              <tr id="date">
-               
-              </tr>
-            </tbody>
-          </table>
+      <section class="col-lg-6 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div class="nav-tabs-custom">
+          <!-- Tabs within a box -->
+          <ul class="nav nav-tabs pull-right">
+            <li class="pull-left header"><i class="fa fa-inbox"></i> Payables</li>
+          </ul>
+          <div class="tab-content no-padding">
+            <!-- Morris chart - Sales -->
+            <div class="table-bordered">
+          <table class="table" id="payablecollectibleTable">
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th>Due Date</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+            <?php
+              $db->allPayables();
+            ?>
+        </table>
+        </div>
           </div>
         </div>
         <!-- /.nav-tabs-custom -->
 
-      <!-- /.Left col -->
-    <!-- /.row (main row) -->
+      </section>
+
+      <section class="col-lg-6 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div class="nav-tabs-custom">
+          <!-- Tabs within a box -->
+          <ul class="nav nav-tabs pull-right">
+            <li class="pull-left header"><i class="fa fa-inbox"></i> Collectibles</li>
+          </ul>
+          <div class="tab-content no-padding">
+            <!-- Morris chart - Sales -->
+            <div class="table-bordered">
+          <table class="table" id="payablecollectibleTable">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Due Date</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+            <?php
+              $db->allCollectibles();
+            ?>
+        </table>
+        </div>
+          </div>
+        </div>
+        <!-- /.nav-tabs-custom -->
+
+      </section>
+    </div>
   </section>
 </div>
 <?php
@@ -114,11 +118,11 @@
   $ui->externalScripts();
 ?>
 <script>
-
+  $('#loader').css("display","none");
   var startDate,endDate,dataParam;
 
     function myFunction() {
-
+      $('#loader').css("display","block");
     dataParam = {"d1":startDate,"d2":endDate};
     console.log(dataParam);
        $.ajax({
@@ -137,15 +141,15 @@
             var cell3 = row.insertCell(2);
 
             if(data.payables == null){
-              cell1.innerHTML = "P 0"; 
+              cell1.innerHTML = "P 0";
             }else{
-              cell1.innerHTML = "P " + data.payables; 
+              cell1.innerHTML = "P " + data.payables;
             }
 
             if(data.collectibles == null){
-              cell2.innerHTML = "P 0"; 
+              cell2.innerHTML = "P 0";
             }else{
-              cell2.innerHTML = "P " + data.collectibles; 
+              cell2.innerHTML = "P " + data.collectibles;
             }
 
             cell3.innerHTML = startDate + " to " + endDate;

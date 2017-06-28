@@ -21,6 +21,12 @@
     </section>
     <!-- Main content -->
     <section class="content">
+      <div class="sk-folding-cube" id="loader">
+        <div class="sk-cube1 sk-cube"></div>
+        <div class="sk-cube2 sk-cube"></div>
+        <div class="sk-cube4 sk-cube"></div>
+        <div class="sk-cube3 sk-cube"></div>
+      </div>
       <?php
         if(isset($_GET['addReturn'])){
           if($_GET['addReturn']==1){
@@ -66,9 +72,10 @@
                   <div class="form-group col-md-4">
                     <div class="input-group date">
                       <div class="input-group-addon">
-                        Return Number
+                        Sale Number
                       </div>
-                      <input type="text" class="form-control" id="return_id" readonly value="<?php echo $db->getMax('returns'); ?>" />
+                      <input type="text" class="form-control" id="sale_id" />
+                      <input type="hidden" class="form-control" value="<?php echo $db->getMax('returns'); ?>" id="return_id" />
                     </div>
                   </div>
 
@@ -151,7 +158,7 @@
 ?>
 
 <script>
-
+  $('#loader').css("display","none");
   function computeTotal(){
     var tot = 0;
     for(let i=0;i<$('.total').length;i++){
@@ -261,6 +268,7 @@
   });
 
   function addReturn(){
+    $('#loader').css("display","block");
     console.log("A")
     var itemList = [];
     for(let i=0;i<10;i++){
@@ -273,6 +281,7 @@
         dataType: 'json',
         data: {'user_id':1,
         		'return_id':$('#return_id').val(),
+            'sale_id': $('#sale_id').val(),
         		'return_date':$('#return_date').val(),
         		'customer_id':$('#customer_id').val(),
         		'total_amount':$('#total_amount').val(),

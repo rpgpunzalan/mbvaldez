@@ -5,6 +5,7 @@ session_start();
   }
   include "../utils/functions.php";
   $ui = new ui_functions();
+  $db = new adps_functions();
 ?>
 <!DOCTYPE html>
 <html>
@@ -29,12 +30,12 @@ session_start();
       <!-- Main row -->
       <div class="row">
         <!-- Left col -->
-        <section class="col-lg-7 connectedSortable">
+        <section class="col-lg-6 connectedSortable">
           <!-- Custom tabs (Charts with tabs)-->
           <div class="nav-tabs-custom">
             <!-- Tabs within a box -->
             <ul class="nav nav-tabs pull-right">
-              <li class="pull-left header"><i class="fa fa-inbox"></i> Weekly Summary</li>
+              <li class="pull-left header"><i class="fa fa-inbox"></i> Payables for this week</li>
             </ul>
             <div class="tab-content no-padding">
               <!-- Morris chart - Sales -->
@@ -42,21 +43,45 @@ session_start();
             <table class="table" id="payablecollectibleTable">
             <thead>
               <tr>
-                <th>Payables</th>
-                <th>Collectibles</th>
-                <th>Date</th>
+                <th>Supplier</th>
+                <th>Amount</th>
+                <th>Due Date</th>
               </tr>
             </thead>
             <tbody>
-              <tr id="item">
-                
+              <?php
+                $db->weeklyPayables(date( 'Y-m-d', strtotime( 'monday this week' ) ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
+              ?>
+            </tbody>
+          </table>
+          </div>
+            </div>
+          </div>
+          <!-- /.nav-tabs-custom -->
+
+        </section>
+        <section class="col-lg-6 connectedSortable">
+          <!-- Custom tabs (Charts with tabs)-->
+          <div class="nav-tabs-custom">
+            <!-- Tabs within a box -->
+            <ul class="nav nav-tabs pull-right">
+              <li class="pull-left header"><i class="fa fa-inbox"></i> Collectibles for this week</li>
+            </ul>
+            <div class="tab-content no-padding">
+              <!-- Morris chart - Sales -->
+              <div class="table-bordered">
+            <table class="table" id="payablecollectibleTable">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Due Date</th>
               </tr>
-              <tr id="cost">
-                
-              </tr>
-              <tr id="date">
-               
-              </tr>
+            </thead>
+            <tbody>
+              <?php
+                $db->weeklyCollectibles(date( 'Y-m-d', strtotime( 'monday this week' ) ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
+              ?>
             </tbody>
           </table>
           </div>
@@ -82,36 +107,36 @@ session_start();
 
   $(document).ready(function(){
 
-    $.ajax({
-      url: '../gateway/adps.php?op=getWeeklyPayableCollectibleReport',
-      type: 'get',
-      dataType: 'json',
-      success: function(data){
-
-        console.log(data);
-
-
-          var table = document.getElementById("payablecollectibleTable");
-          var row = table.insertRow(1);
-          var cell1 = row.insertCell(0);
-          var cell2 = row.insertCell(1);
-          var cell3 = row.insertCell(2);
-
-          if(data.payables == null){
-            cell1.innerHTML = "P 0"; 
-          }else{
-            cell1.innerHTML = "P " + data.payables; 
-          }
-
-          if(data.collectibles == null){
-            cell2.innerHTML = "P 0"; 
-          }else{
-            cell2.innerHTML = "P " + data.collectibles; 
-          }
-          cell3.innerHTML = data.startDate + " to " + data.endDate;
-
-      }
-    });
+    // $.ajax({
+    //   url: '../gateway/adps.php?op=getWeeklyPayableCollectibleReport',
+    //   type: 'get',
+    //   dataType: 'json',
+    //   success: function(data){
+    //
+    //     console.log(data);
+    //
+    //
+    //       var table = document.getElementById("payablecollectibleTable");
+    //       var row = table.insertRow(1);
+    //       var cell1 = row.insertCell(0);
+    //       var cell2 = row.insertCell(1);
+    //       var cell3 = row.insertCell(2);
+    //
+    //       if(data.payables == null){
+    //         cell1.innerHTML = "P 0";
+    //       }else{
+    //         cell1.innerHTML = "P " + data.payables;
+    //       }
+    //
+    //       if(data.collectibles == null){
+    //         cell2.innerHTML = "P 0";
+    //       }else{
+    //         cell2.innerHTML = "P " + data.collectibles;
+    //       }
+    //       cell3.innerHTML = data.startDate + " to " + data.endDate;
+    //
+    //   }
+    // });
 
 
   });

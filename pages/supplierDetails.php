@@ -5,6 +5,7 @@
   if(isset($_GET['supplier_id'])){
     $supplier_id = $_GET['supplier_id'];
   }
+  $db = new adps_functions();
 ?>
 
 <!DOCTYPE html>
@@ -60,16 +61,22 @@
 
                   </div>
                   <div class="box-body" id="vitalsHistory">
-
+                    <table class="table table-bordered">
+                      <thead>
+                        <th>Date</th>
+                        <th>Due Date</th>
+                      </thead>
+                      <?php $db->getSupplierPayables($supplier_id); ?>
+                    </table>
                   </div>
                 </div>
 
-                <div class="box box-primary">
+                <!-- <div class="box box-primary">
                   <div class="box-header with-border">
                     <h6 class="box-title">Transaction History</h6>
 
                   </div>
-                </div>
+                </div> -->
 
 
               </div>

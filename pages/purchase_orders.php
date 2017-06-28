@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <?php $ui->showHeadHTML("Order Confirmation Slips");?>
+  <?php $ui->showHeadHTML("Purchase Invoice Confirmation Slips");?>
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
@@ -17,7 +17,7 @@
   ?>
   <section class="content-header">
     <h1>
-      Order Confirmation Slips
+      Purchase Invoice Confirmation Slips
     </h1>
   </section>
   <!-- CONTENT HERE -->
@@ -105,7 +105,7 @@
 
         <div class="box box-success">
           <div class="box-header with-border">
-            <a href="addPO.php"><i class="fa fa-plus"></i> Add New OCS</a>
+            <a href="addPO.php"><i class="fa fa-plus"></i> Add New PICS</a>
           </div>
           <div class="tab-content no-padding">
 
@@ -113,7 +113,8 @@
                 <table id="purchaseOrderTable" class="table table-bordered table-striped">
                   <thead>
                   <tr>
-                    <th>OCS Number</th>
+                    <th>Shipment Number</th>
+                    <th>Invoice Number</th>
                     <th>Date</th>
                     <th>Total Amount</th>
                     <th>Balance</th>
@@ -127,7 +128,8 @@
                   </tbody>
                   <tfoot>
                   <tr>
-                    <th>OCS Number</th>
+                    <th>Shipment Number</th>
+                    <th>Invoice Number</th>
                     <th>Date</th>
                     <th>Total Amount</th>
                     <th>Balance</th>
@@ -202,7 +204,8 @@
         {
           if((po.total_amount-po.amount_paid)>0)
             $('#purchaseOrderTable tbody').html($('#purchaseOrderTable tbody').html()+
-                                            "<tr><td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
+                                            "<tr><td>"+ po.shipment_no +"</td>"+
+                                            "<td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
                                             "</td><td>"+po.po_date+
                                             "</td><td>"+po.total_amount+
                                             "</td><td>"+(po.total_amount-po.amount_paid).toFixed(2)+
@@ -212,7 +215,8 @@
 
           else {
             $('#purchaseOrderTable tbody').html($('#purchaseOrderTable tbody').html()+
-                                              "<tr><td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
+                                              "<tr><td>"+ po.shipment_no +"</td>"+
+                                              "<td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
                                               "</td><td>"+po.po_date+
                                               "</td><td>"+po.total_amount+
                                               "</td><td>"+(po.total_amount-po.amount_paid).toFixed(2)+

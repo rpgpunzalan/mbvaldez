@@ -1,4 +1,5 @@
 <?php
+session_start();
   include "../utils/functions.php";
   $ui = new ui_functions();
   $db = new adps_functions();
@@ -20,6 +21,12 @@
     </section>
     <!-- Main content -->
     <section class="content">
+      <div class="sk-folding-cube" id="loader">
+        <div class="sk-cube1 sk-cube"></div>
+        <div class="sk-cube2 sk-cube"></div>
+        <div class="sk-cube4 sk-cube"></div>
+        <div class="sk-cube3 sk-cube"></div>
+      </div>
       <?php
         if(isset($_GET['addSaleOrder'])){
           if($_GET['addSaleOrder']==1){
@@ -165,6 +172,7 @@
     return tot;
   }
   $(function () {
+    $('#loader').css("display","none");
     $.ajax({
       url: '../gateway/adps.php?op=getItemByCustomer',
       type: 'post',
@@ -280,6 +288,7 @@
   });
 
   function addSale(){
+    $('#loader').css("display","block");
     var itemList = [];
     for(let i=0;i<10;i++){
       if($('.particulars')[i].value != "-1")

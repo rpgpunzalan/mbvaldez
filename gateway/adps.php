@@ -112,7 +112,7 @@
 							$expense_id = $db->addExpense(date_create($_POST['sale_date']),$customer['customer_name'],$customer['address'],1,$_POST['discount'],1,$_POST['discount'],date_create($_POST['sale_date']),-1,$record_id);
 							$db->addExpenseItem($expense_id,"Discount for Sale Number ".$_POST['sale_id'],$_POST['discount']);
 						}
-          $sale_id = $db->addSale($_POST['customer_id'],date_create($_POST['sale_date']),$_POST['total_amount'],$record_id,$_POST['discount']);
+          $sale_id = $db->addSale($_POST['sale_id'],$_POST['customer_id'],date_create($_POST['sale_date']),$_POST['total_amount'],$record_id,$_POST['discount']);
           if(is_numeric($sale_id)){
 						$itemList = $_POST['itemList'];
 						for($i=0;$i<count($itemList);$i++){
@@ -136,7 +136,7 @@
 						for($i=0;$i<count($itemList);$i++){
 							$item_id = $db->addReturnItem($_POST['return_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 							$db->addInventory($itemList[$i][0],($itemList[$i][1]),$itemList[$i][2],date_create($_POST['return_date']),$record_id);
-							$db->updateInventory($_POST['return_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
+							$db->updateSaleItem($_POST['sale_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 						}
 						echo json_encode(array("status"=>"success","return_id"=>$return_id));
 					}
@@ -148,7 +148,7 @@
       	case "addReturnEmpty":{
 
         if(isset($_POST['return_date'])&&isset($_POST['itemList'])){
-          
+
 			$itemList = $_POST['itemList'];
 			for($i=0;$i<count($itemList);$i++){
 				$return_id = $db->addReturnEmpty($_POST['return_id'],$itemList[$i][0],$_POST['customer_id'],$itemList[$i][1],$itemList[$i][2],$_POST['return_date']);
@@ -167,7 +167,7 @@
           $record_id = $db->addRecord($_SESSION['user_id']);
 					$date = date_create($_POST['po_date']);
 					$due_date = date_add($date,date_interval_create_from_date_string("2 days"));
-          $po_id = $db->addPurchaseOrder($_POST['po_id'],date_create($_POST['po_date']),$_POST['total_amount'],$due_date,1,$record_id,$_POST['discount']);
+          $po_id = $db->addPurchaseOrder($_POST['po_id'],date_create($_POST['po_date']),$_POST['total_amount'],$due_date,1,$record_id,$_POST['discount'],$_POST['shipment_no']);
           if(is_numeric($po_id)){
 						$itemList = $_POST['itemList'];
 						for($i=0;$i<count($itemList);$i++){
@@ -301,12 +301,12 @@
 		    		$netsales = 0;
 
 		    		foreach($res as $sales){
-						$total_sales = $total_sales + $sales['total_amount'];
-						$total_discount = $total_discount + $sales['discount'];
-						$item_id = $db->getIncomeStatementSaleItem($sales['sale_id']);
-						$cost = $db->getIncomeStatementItems($item_id);
-						$total_cost = $total_cost + $cost;
-					}
+							$total_sales = $total_sales + $sales['total_amount'];
+							$total_discount = $total_discount + $sales['discount'];
+							$item_id = $db->getIncomeStatementSaleItem($sales['sale_id']);
+							$cost = $db->getIncomeStatementItems($item_id);
+							$total_cost = $total_cost + $cost;
+						}
 					$expenses = $db->getIncomeStatementExpenses();
 					$netsales = $total_sales - $total_discount;
 					//$total_cost = 0;
@@ -385,24 +385,21 @@
 				$sunday = date( 'Y-m-d', strtotime( 'sunday this week' ) );
 	      		$payables = $db->getPayableReport($monday,$sunday);
 	      		$collectibles = $db->getCollectibleReport($monday,$sunday);
-	      		if($payables && $collectibles){
+	      if($payables && $collectibles){
 
 		    		$total_payable = 0;
 		    		$total_collectible = 0;
 
 		    		foreach($payables as $payable){
-						$total = $payable['total_amount'] - $payable['amount_paid'];
-						$total_payable = $total_payable + $total;
-					}
-
+							$total_payable = $total_payable + ($payable['total_amount'] - $payable['amount_paid']);
+						}
 					foreach($collectibles as $collectible){
-						$total = $collectible['total_amount'] - $collectible['amount_paid'];
-						$total_collectible = $total_collectible + $total;
+						$total_collectible = $total_collectible + ( $collectible['total_amount'] - $collectible['amount_paid']);
 					}
 
 					echo json_encode(array("status"=>"success","payables"=>$total_payable,"collectibles"=>$total_collectible,"startDate"=>$monday,"endDate"=>$sunday));
 				}else{
-					echo json_encode(array("status"=>"success","result"=>"empty","startDate"=>$monday,"endDate"=>$sunday));
+					echo json_encode(array("status"=>"success","result"=>$payables,"startDate"=>$monday,"endDate"=>$sunday));
 				}
 				break;
 			}

@@ -6,6 +6,9 @@
   if(isset($_GET['d1']) && isset($_GET['d2'])){
     $d1 = $_GET['d1'];
     $d2 = $_GET['d2'];
+  }else {
+    $d1 = '2017-01-01';
+    $d2 = date( 'Y-m-d', strtotime( 'today' ) );
   }
 ?>
 <!DOCTYPE html>

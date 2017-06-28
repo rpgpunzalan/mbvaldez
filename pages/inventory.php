@@ -8,6 +8,7 @@
     $d1 = $_GET['d1'];
     $d2 = $_GET['d2'];
   }
+  $db = new adps_functions();
 ?>
 
 <!DOCTYPE html>
@@ -70,6 +71,48 @@
       <!-- /.row (main row) -->
 
     </section>
+    <section class="content-header">
+      <h1>
+        Empties
+      </h1>
+    </section>
+    <section class="content">
+      <div class="row">
+      	<div class="col-md-12">
+	      	<div class="box box-success">
+		        <div class="box-header with-border">
+		        </div>
+		        <div class="box-body">
+
+		          <table id="emptiesTable" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th>Particulars</th>
+                  <th>Empty Bottles</th>
+                  <th>Empty Cases</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <?php
+                    $db->getEmptiesInventory();
+                  ?>
+                </tbody>
+                <tfoot>
+                <tr>
+                  <th>Particulars</th>
+                  <th>Empty Bottles</th>
+                  <th>Empty Cases</th>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
+	         <!-- /.box-body -->
+	      	</div>
+      	</div>
+      </div>
+      <!-- /.row (main row) -->
+
+    </section>
 </div>
 <?php
   $ui->showFooter();
@@ -91,11 +134,15 @@
         $('#inventoryTable tbody').html("");
         $.each(data.result, function(i,item)
         {
+          let qty = item.quantity;
+          if(item.quantity==null){
+            qty = 0;
+          }
           $('#inventoryTable tbody').html($('#inventoryTable tbody').html()+
-                                            "<tr><td><a href=#itemDetails.php?item_id="+item.item_id+">"+item.item_description+"</a>"+
+                                            "<tr><td>"+item.item_description+
                                             "</td><td>"+item.display_srp+
                                             "</td><td><a href=supplierDetails.php?supplier_id="+item.supplier_id+">"+item.supplier_name+"</a>"+
-                                            "</td><td>"+item.quantity+"</td></tr>");
+                                            "</td><td>"+qty+"</td></tr>");
         });
       $('#inventoryTable').dataTable();
       }

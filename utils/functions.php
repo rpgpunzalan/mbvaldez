@@ -542,9 +542,9 @@ class adps_functions{
     return $ret;
   }
 
-  public function addPurchaseOrder($po_id,$po_date,$total_amount,$due_date,$status,$record_id,$discount){
+  public function addPurchaseOrder($po_id,$po_date,$total_amount,$due_date,$status,$record_id,$discount,$shipment_no){
     $link = $this->connect();
-    $query=sprintf("INSERT INTO purchase_orders(po_id,supplier_id,po_date,total_amount,amount_paid,due_date,status,record_id,discount)
+    $query=sprintf("INSERT INTO purchase_orders(po_id,supplier_id,po_date,total_amount,amount_paid,due_date,status,record_id,discount,shipment_no)
                     VALUES('".mysqli_real_escape_string($link,$po_id)."',
 													'".mysqli_real_escape_string($link,"1")."',
                           '".mysqli_real_escape_string($link,date_format($po_date,"Y-m-d"))."',
@@ -553,7 +553,8 @@ class adps_functions{
                           '".mysqli_real_escape_string($link,date_format($due_date,"Y-m-d"))."',
                           '".mysqli_real_escape_string($link,$status)."',
                           '".mysqli_real_escape_string($link,$record_id)."',
-                          '".mysqli_real_escape_string($link,$discount)."')");
+                          '".mysqli_real_escape_string($link,$discount)."',
+                          '".mysqli_real_escape_string($link,$shipment_no)."')");
 
     if (!mysqli_query($link, $query)) {
         return mysqli_error($link);
@@ -788,11 +789,42 @@ class adps_functions{
 
   }
 
-  public function addSale($customer_id,$sale_date,$total_amount,$record_id,$discount){
+  public function updateSaleItem($sale_id,$item_id,$quantity,$amount){
     $link = $this->connect();
-    $query=sprintf("INSERT INTO sales(customer_id,sale_date,total_amount,due_date,record_id,discount)
-                    VALUES('".mysqli_real_escape_string($link,$customer_id)."',
-                          '".mysqli_real_escape_string($link,date_format($sale_date,"Y-m-d"))."',
+
+    $query=sprintf("UPDATE sale_items
+                    SET quantity = quantity - '".mysqli_real_escape_string($link,$quantity)."'
+                    WHERE sale_id = '".mysqli_real_escape_string($link,$sale_id)."'
+										AND item_id = '".mysqli_real_escape_string($link,$item_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+
+        return mysqli_error($link);
+    }else {
+			$this->updateSale($sale_id,$amount*$quantity);
+			return mysqli_insert_id($link);
+		}
+  }
+
+  public function updateSale($sale_id,$amount){
+    $link = $this->connect();
+
+    $query=sprintf("UPDATE sales
+                    SET total_amount = total_amount-'".mysqli_real_escape_string($link,$amount)."'
+                    WHERE sale_id = '".mysqli_real_escape_string($link,$sale_id)."'");
+
+		if (!mysqli_query($link, $query)) {
+        return mysqli_error($link);
+    }else return mysqli_insert_id($link);
+
+  }
+
+  public function addSale($sale_id,$customer_id,$sale_date,$total_amount,$record_id,$discount){
+    $link = $this->connect();
+    $query=sprintf("INSERT INTO sales(sale_id,customer_id,sale_date,total_amount,due_date,record_id,discount)
+                    VALUES('".mysqli_real_escape_string($link,$sale_id)."',
+													'".mysqli_real_escape_string($link,$customer_id)."',
+													'".mysqli_real_escape_string($link,date_format($sale_date,"Y-m-d"))."',
                           '".mysqli_real_escape_string($link,$total_amount)."',
                           '".mysqli_real_escape_string($link,date_format($sale_date,"Y-m-d"))."',
                           '".mysqli_real_escape_string($link,$record_id)."',
@@ -894,6 +926,28 @@ class adps_functions{
     }
     return $data;
   }
+
+	public function getEmptiesInventory(){
+		$link = $this->connect();
+    $query = "SELECT it.item_description,
+											sum(re.num_bottle) as 'bottles',
+											sum(re.num_case) as 'cases'
+							FROM return_empty re
+							INNER JOIN items it
+							ON it.item_id = re.item_id
+							GROUP BY it.item_id";
+    $result = mysqli_query ( $link, $query );
+    while($row =mysqli_fetch_assoc($result))
+    {
+        print "
+					<tr>
+						<td>".$row['item_description']."</td>
+						<td>".$row['bottles']."</td>
+						<td>".$row['cases']."</td>
+					</tr>
+				";
+    }
+	}
 
   public function getBankById($bank_id){
     $link = $this->connect();
@@ -1043,6 +1097,51 @@ class adps_functions{
     return $data;
   }
 
+	public function getInventoryReport($d1,$d2){
+		$link = $this->connect();
+		$query = "SELECT it.item_description,
+											(Select sum(quantity) from inventory
+											 where quantity >=1 AND
+											 trans_date BETWEEN '$d1' AND '$d2'
+										 	AND item_id = i.item_id) as 'in',
+											 (Select sum(quantity*-1) from inventory
+ 											 where quantity <0 AND
+ 											 trans_date BETWEEN '$d1' AND '$d2'
+										 	AND item_id = i.item_id) as 'out',
+											sum(i.quantity) as 'total',
+											it.cost
+						FROM inventory i
+						INNER JOIN items it
+						ON it.item_id = i.item_id
+						WHERE i.trans_date BETWEEN '".$d1."' AND '".$d2."'
+						GROUP BY i.item_id";
+		$result = mysqli_query ( $link, $query );
+		print "<tbody>";
+		$total=0;
+		while($row =mysqli_fetch_assoc($result))
+		{
+			$out = 0;
+			$in = 0;
+			if($row['out']) $out = $row['out'];
+			if($row['in']) $in = $row['in'];
+			print "<tr>
+				<td>".$row['item_description']."</td>
+				<td>".number_format($in,0)."</td>
+				<td>".number_format($out,0)."</td>
+				<td>".number_format($row['total'],0)."</td>
+			</tr>";
+			$total += $row['total']*$row['cost'];
+		}
+		print "</tbody>
+		<tfooter>
+			<tr>
+				<td colspan=3>Inventory Cost</td>
+				<td>".number_format($total,2)."</td>
+			</tr>
+		</tfooter>
+		";
+	}
+
   public function getInventoryReportQuantity($d1, $d2){
     $link = $this->connect();
     $query = "SELECT quantity,
@@ -1075,12 +1174,194 @@ class adps_functions{
     return $data;
   }
 
+	public function allPayables(){
+    $link = $this->connect();
+    $query = "SELECT sum(po.total_amount-po.amount_paid) as 'bal',
+										s.supplier_name,
+										po.due_date
+							FROM purchase_orders po
+							INNER JOIN suppliers s
+							ON s.supplier_id = po.supplier_id
+							GROUP BY po.due_date, po.supplier_id
+							HAVING sum(po.total_amount-po.amount_paid)>0
+							ORDER BY po.due_date DESC";
+    $result = mysqli_query ( $link, $query );
+		print "<tbody>";
+		$total=0;
+   while($row =mysqli_fetch_assoc($result))
+    {
+       print "
+			 	<tr>
+					<td>".$row['supplier_name']."</td>
+					<td>".$row['due_date']."</td>
+					<td>".number_format($row['bal'],2)."</td>
+				</tr>
+			 ";
+			 $total+=$row['bal'];
+    }
+		print "</tbody>
+		<tfooter>
+			<tr>
+				<td colspan=2>Total Payables</td>
+				<td>".number_format($total,2)."</td>
+			</tr>
+		</tfooter>
+		";
+  }
+	public function getSupplierPayables($supplier_id){
+    $link = $this->connect();
+    $query = "SELECT sum(po.total_amount-po.amount_paid) as 'bal',
+										s.supplier_name,
+										po.due_date
+							FROM purchase_orders po
+							INNER JOIN suppliers s
+							ON s.supplier_id = po.supplier_id
+							WHERE po.supplier_id = '".$supplier_id."'
+							GROUP BY po.due_date
+							HAVING sum(po.total_amount-po.amount_paid)>0";
+    $result = mysqli_query ( $link, $query );
+		print "<tbody>";
+		$total=0;
+   while($row =mysqli_fetch_assoc($result))
+    {
+       print "
+			 	<tr>
+					<td>".$row['due_date']."</td>
+					<td>".number_format($row['bal'],2)."</td>
+				</tr>
+			 ";
+			 $total+=$row['bal'];
+    }
+		print "</tbody>
+		<tfooter>
+			<tr>
+				<td>Total Payables</td>
+				<td>".number_format($total,2)."</td>
+			</tr>
+		</tfooter>
+		";
+  }
+	public function getCustomerCollectibles($customer_id){
+		$link = $this->connect();
+    $query = "SELECT sum(po.total_amount-po.amount_paid) as 'bal',
+										s.customer_name,
+										po.due_date
+							FROM sales po
+							INNER JOIN customers s
+							ON s.customer_id = po.customer_id
+							WHERE po.customer_id = '".$customer_id."'
+							GROUP BY po.due_date
+							HAVING sum(po.total_amount-po.amount_paid)>0
+							ORDER BY po.due_date DESC";
+    $result = mysqli_query ( $link, $query );
+		print "<tbody>";
+		$total = 0;
+   while($row =mysqli_fetch_assoc($result))
+    {
+       print "
+			 	<tr>
+					<td>".$row['due_date']."</td>
+					<td>".number_format($row['bal'],2)."</td>
+				</tr>
+			 ";
+			 $total += $row['bal'];
+    }
+		print "</tbody>
+		<tfooter>
+			<tr>
+				<td>Total Collectibles</td>
+				<td>".number_format($total,2)."</td>
+			</tr>
+		</tfooter>
+		";
+	}
+	public function allCollectibles(){
+    $link = $this->connect();
+    $query = "SELECT sum(po.total_amount-po.amount_paid) as 'bal',
+										s.customer_name,
+										po.due_date
+							FROM sales po
+							INNER JOIN customers s
+							ON s.customer_id = po.customer_id
+							GROUP BY po.due_date,po.customer_id
+							HAVING sum(po.total_amount-po.amount_paid)>0
+							ORDER BY po.due_date DESC";
+    $result = mysqli_query ( $link, $query );
+		print "<tbody>";
+		$total = 0;
+   while($row =mysqli_fetch_assoc($result))
+    {
+       print "
+			 	<tr>
+					<td>".$row['customer_name']."</td>
+					<td>".$row['due_date']."</td>
+					<td>".number_format($row['bal'],2)."</td>
+				</tr>
+			 ";
+			 $total += $row['bal'];
+    }
+		print "</tbody>
+		<tfooter>
+			<tr>
+				<td colspan=2>Total Collectibles</td>
+				<td>".number_format($total,2)."</td>
+			</tr>
+		</tfooter>
+		";
+  }
+
+	public function weeklyPayables($d1, $d2){
+    $link = $this->connect();
+    $query = "SELECT sum(po.total_amount-po.amount_paid) as 'bal',
+										s.supplier_name,
+										po.due_date
+							FROM purchase_orders po
+							INNER JOIN suppliers s
+							ON s.supplier_id = po.supplier_id
+							WHERE po.due_date
+							BETWEEN '".$d1."' AND '".$d2."'
+							GROUP BY po.due_date, po.supplier_id
+							HAVING sum(po.total_amount-po.amount_paid)>0
+							ORDER BY po.due_date DESC";
+    $result = mysqli_query ( $link, $query );
+   while($row =mysqli_fetch_assoc($result))
+    {
+       print "
+			 	<tr>
+					<td>".$row['supplier_name']."</td>
+					<td>".number_format($row['bal'],2)."</td>
+					<td>".$row['due_date']."</td>
+				</tr>
+			 ";
+    }
+  }
+	public function weeklyCollectibles($d1, $d2){
+    $link = $this->connect();
+    $query = "SELECT sum(po.total_amount-po.amount_paid) as 'bal',
+										s.customer_name,
+										po.due_date
+							FROM sales po
+							INNER JOIN customers s
+							ON s.customer_id = po.customer_id
+							WHERE po.due_date BETWEEN '".$d1."' AND '".$d2."'
+							GROUP BY po.due_date, po.customer_id
+							HAVING sum(po.total_amount-po.amount_paid)>0
+							ORDER BY po.due_date DESC";
+    $result = mysqli_query ( $link, $query );
+   while($row =mysqli_fetch_assoc($result))
+    {
+       print "
+			 	<tr>
+					<td>".$row['customer_name']."</td>
+					<td>".number_format($row['bal'],2)."</td>
+					<td>".$row['due_date']."</td>
+				</tr>
+			 ";
+    }
+  }
   public function getPayableReport($d1, $d2){
     $link = $this->connect();
-    $query = "SELECT total_amount,
-                    amount_paid
-            FROM purchase_orders
-            WHERE due_date BETWEEN '".$d1."' AND '".$d2."'";
+    $query = "SELECT total_amount,amount_paid FROM purchase_orders WHERE due_date BETWEEN '".$d1."' AND '".$d2."'";
     $result = mysqli_query ( $link, $query );
     $data = array();
    while($row =mysqli_fetch_assoc($result))
@@ -1135,8 +1416,7 @@ class adps_functions{
 
   public function getIncomeStatementItems($item_id){
       $link = $this->connect();
-      $query = "SELECT item_id,
-                      cost AS cost
+      $query = "SELECT cost
               FROM items
               WHERE item_id = '".$item_id."'";
       $result = mysqli_query ( $link, $query );
@@ -1511,7 +1791,7 @@ class adps_functions{
 							ON i.item_id = it.item_id
 							INNER JOIN suppliers s
 							ON s.supplier_id = it.supplier_id
-							GROUP BY it.item_id
+							GROUP BY i.item_id
               ORDER BY item_description";
     $result = mysqli_query ( $link, $query );
     $data = array();
@@ -1652,7 +1932,8 @@ class adps_functions{
                     p.payment_method,
                     stat.status_name,
                     p.cc_id,
-                    p.record_id
+                    p.record_id,
+                    p.shipment_no
               FROM  purchase_orders p
               INNER JOIN suppliers s
               ON s.supplier_id = p.supplier_id
@@ -1680,7 +1961,8 @@ class adps_functions{
                     p.payment_method,
                     stat.status_name,
                     p.cc_id,
-                    p.record_id
+                    p.record_id,
+                    p.shipment_no
               FROM  purchase_orders p
               INNER JOIN suppliers s
               ON s.supplier_id = p.supplier_id
@@ -1709,7 +1991,8 @@ class adps_functions{
                     p.payment_method,
                     stat.status_name,
                     p.cc_id,
-                    p.record_id
+                    p.record_id,
+                    p.shipment_no
               FROM  purchase_orders p
               INNER JOIN suppliers s
               ON s.supplier_id = p.supplier_id
@@ -1765,6 +2048,43 @@ class adps_functions{
         $data[] = $row;
     }
     return $data;
+  }
+	public function getSales($d1,$d2){
+    $link = $this->connect();
+    $query = "SELECT sum(total_amount) as 'total_amount'
+              FROM  sales s
+							WHERE s.sale_date BETWEEN '".$d1."' AND '".$d2."' ";
+    $result = mysqli_query ( $link, $query );
+    while($row =mysqli_fetch_assoc($result))
+    {
+			return $row['total_amount'];
+    }
+  }
+	public function getCostOfSales($d1,$d2){
+    $link = $this->connect();
+    $query = "SELECT sum(i.cost*s.quantity) as 'total_amount'
+              FROM  sale_items s
+							INNER JOIN items i
+							ON i.item_id = s.item_id
+							INNER JOIN sales ss
+							ON ss.sale_id = s.sale_id
+							WHERE ss.sale_date BETWEEN '".$d1."' AND '".$d2."' ";
+    $result = mysqli_query ( $link, $query );
+    while($row =mysqli_fetch_assoc($result))
+    {
+			return $row['total_amount'];
+    }
+  }
+	public function getExpenses($d1,$d2){
+    $link = $this->connect();
+    $query = "SELECT sum(amount) as 'total_amount'
+              FROM  expenses
+							WHERE expense_date BETWEEN '".$d1."' AND '".$d2."' ";
+    $result = mysqli_query ( $link, $query );
+    while($row =mysqli_fetch_assoc($result))
+    {
+			return $row['total_amount'];
+    }
   }
 	public function getSaleList(){
     $link = $this->connect();
@@ -2235,7 +2555,7 @@ class ui_functions{
 			          <ul class="treeview-menu">
 			            <li><a href="sales.php"><i class="fa fa-circle-o"></i> Sales List</a></li>
 			            <li><a href="customers.php"><i class="fa fa-circle-o"></i> Customers</a></li>
-			            
+
 			          </ul>
 		          </li>
 							';if($active==5) print'
@@ -2277,14 +2597,14 @@ class ui_functions{
 			          </ul>
 		          </li>';
 							}
-              '';if($active==8) print'
-              <li class="active">';
-              else print '<li>';
-              print'
-                <a href="recordbankslip.php">
-                  <i class="fa fa-bank"></i> <span>Record Bank Slip</span>
-                </a>
-              </li>';
+              // '';if($active==8) print'
+              // <li class="active">';
+              // else print '<li>';
+              // print'
+              //   <a href="recordbankslip.php">
+              //     <i class="fa fa-bank"></i> <span>Record Bank Slip</span>
+              //   </a>
+              // </li>';
               '';if($active==9) print'
               <li class="active">';
               else print '<li>';

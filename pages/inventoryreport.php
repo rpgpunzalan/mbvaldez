@@ -6,7 +6,11 @@
   if(isset($_GET['d1']) && isset($_GET['d2'])){
     $d1 = $_GET['d1'];
     $d2 = $_GET['d2'];
+  }else {
+    $d1 = '2017-01-01';
+    $d2 = date( 'Y-m-d', strtotime( 'today' ) );
   }
+  $db = new adps_functions();
 ?>
 <!DOCTYPE html>
 <html>
@@ -27,12 +31,12 @@
   <!-- CONTENT HERE -->
   <!-- Main content -->
   <section class="content">
-    <!-- <div class="sk-folding-cube" id="loader">
+    <div class="sk-folding-cube" id="loader">
       <div class="sk-cube1 sk-cube"></div>
       <div class="sk-cube2 sk-cube"></div>
       <div class="sk-cube4 sk-cube"></div>
       <div class="sk-cube3 sk-cube"></div>
-    </div> -->
+    </div>
     <?php
       if(isset($_GET['recordPayment'])){
         if($_GET['recordPayment']==1){
@@ -58,7 +62,7 @@
         if(isset($_GET['d1'])&&isset($_GET['d2'])){
 
         ?>
-          <input type="hidden" value="<?php echo $d1; ?>" id="startDate" />
+          <input type="hidden" value="2017-01-01" id="startDate" />
           <input type="hidden" value="<?php echo $d2; ?>" id="endDate" />
         <?php
         }
@@ -66,13 +70,13 @@
         <div class="box box-success">
           <div class="box-header with-border">
             <div class="form-group">
-              <label>Date range:</label>
+              <label>Until Date:</label>
 
               <div class="input-group">
                 <div class="input-group-addon">
                   <i class="fa fa-calendar"></i>
                 </div>
-                <input type="text" class="form-control pull-right" id="dateRange">
+                <input type="date" class="form-control pull-right" id="untilDate">
               </div>
               <!-- /.input group -->
             </div>
@@ -85,14 +89,12 @@
             <thead>
               <tr>
                 <th>Item</th>
-                <th>Cost</th>
-                <th>Quantity</th>
+                <th>In</th>
+                <th>Out</th>
                 <th>Total</th>
-                <th>Date</th>
               </tr>
             </thead>
-            <tbody>
-            </tbody>
+              <?php $db->getInventoryReport($d1,$d2); ?>
           </table>
           </div>
         </div>
@@ -107,52 +109,54 @@
   $ui->externalScripts();
 ?>
 <script>
-
+  $('#loader').css("display","none");
   var startDate,endDate,dataParam;
 
     function myFunction() {
-
+      // console.log();
+      $('#loader').css("display","block");
     dataParam = {"d1":startDate,"d2":endDate};
+    window.location.href = "inventoryreport.php?d1=2017-01-01&d2="+$('#untilDate').val();
     //console.log(dataParam);
-       $.ajax({
-          url: '../gateway/adps.php?op=getInventoryReport',
-          type: 'get',
-          dataType: 'json',
-          data:dataParam,
-          success: function(data){
-
-            /*console.log(data.res[0].item_description);*/
-            //console.log(data.items[0].item_description);
-
-            $('#inventoryTable tr').not(function(){ return !!$(this).has('th').length; }).remove();
-
-            console.log("hello");
-
-            for(var i = data.res.length-1; i >= 0; i--){
-              var table = document.getElementById("inventoryTable");
-              var row = table.insertRow(1);
-              var cell1 = row.insertCell(0);
-              var cell2 = row.insertCell(1);
-              var cell3 = row.insertCell(2);
-              var cell4 = row.insertCell(3);
-              var cell5 = row.insertCell(4);
-             
-              
-              for(var j = 0; j < data.items.length; j++){
-                if(data.res[i].item_id == data.items[j].item_id){
-                  cell1.innerHTML = data.items[j].item_description;
-                }
-              }
-              cell2.innerHTML = data.res[i].cost; 
-              cell3.innerHTML = data.res[i].quantity; 
-              cell4.innerHTML = "P " + data.res[i].quantity * data.res[i].cost;
-              cell5.innerHTML = data.res[i].trans_date;
-
-              
-            }
-
-          }
-        });
+      //  $.ajax({
+      //     url: '../gateway/adps.php?op=getInventoryReport',
+      //     type: 'get',
+      //     dataType: 'json',
+      //     data:dataParam,
+      //     success: function(data){
+       //
+      //       /*console.log(data.res[0].item_description);*/
+      //       //console.log(data.items[0].item_description);
+       //
+      //       $('#inventoryTable tr').not(function(){ return !!$(this).has('th').length; }).remove();
+       //
+      //       console.log("hello");
+       //
+      //       for(var i = data.res.length-1; i >= 0; i--){
+      //         var table = document.getElementById("inventoryTable");
+      //         var row = table.insertRow(1);
+      //         var cell1 = row.insertCell(0);
+      //         var cell2 = row.insertCell(1);
+      //         var cell3 = row.insertCell(2);
+      //         var cell4 = row.insertCell(3);
+      //         var cell5 = row.insertCell(4);
+      //
+      //
+      //         for(var j = 0; j < data.items.length; j++){
+      //           if(data.res[i].item_id == data.items[j].item_id){
+      //             cell1.innerHTML = data.items[j].item_description;
+      //           }
+      //         }
+      //         cell2.innerHTML = data.res[i].cost;
+      //         cell3.innerHTML = data.res[i].quantity;
+      //         cell4.innerHTML = "P " + data.res[i].quantity * data.res[i].cost;
+      //         cell5.innerHTML = data.res[i].trans_date;
+       //
+      //
+      //       }
+       //
+      //     }
+      //   });
   }
 
   $(document).ready(function(){
