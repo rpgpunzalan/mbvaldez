@@ -115,6 +115,7 @@
                   <tr>
                     <th>Shipment Number</th>
                     <th>Invoice Number</th>
+                    <th>Supplier</th>
                     <th>Date</th>
                     <th>Total Amount</th>
                     <th>Balance</th>
@@ -130,6 +131,7 @@
                   <tr>
                     <th>Shipment Number</th>
                     <th>Invoice Number</th>
+                    <th>Supplier</th>
                     <th>Date</th>
                     <th>Total Amount</th>
                     <th>Balance</th>
@@ -206,6 +208,7 @@
             $('#purchaseOrderTable tbody').html($('#purchaseOrderTable tbody').html()+
                                             "<tr><td>"+ po.shipment_no +"</td>"+
                                             "<td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
+                                            "</td><td>"+po.supplier_name+
                                             "</td><td>"+po.po_date+
                                             "</td><td>"+po.total_amount+
                                             "</td><td>"+(po.total_amount-po.amount_paid).toFixed(2)+
@@ -217,6 +220,7 @@
             $('#purchaseOrderTable tbody').html($('#purchaseOrderTable tbody').html()+
                                               "<tr><td>"+ po.shipment_no +"</td>"+
                                               "<td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
+                                              "</td><td>"+po.supplier_name+
                                               "</td><td>"+po.po_date+
                                               "</td><td>"+po.total_amount+
                                               "</td><td>"+(po.total_amount-po.amount_paid).toFixed(2)+

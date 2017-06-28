@@ -46,18 +46,20 @@ session_start();
 		        <div class="box-body">
               <div class="col-md-12">
   		        	<div>
-                  <input type="hidden" id="supplier_id" value="1" />
+                  <!-- <input type="hidden" id="supplier_id" value="1" /> -->
                 </div>
   		        	<div>
                 <div class="col-md-12">
                   <table class="table">
                     <thead>
-                      <th width="50%">Item Description</th>
+                      <th width="30%">Item Description</th>
+                      <th width="20%">Supplier</th>
                       <th width="10%">Cost</th>
                       <th width="20%">SRP</th>
                     </thead>
                     <tr>
                       <td><input type="text" class="form-control" id="item_description" placeholder=""></td>
+                      <td><select id="supplier_id" class="form-control"><?php $db->ddlSuppliers(); ?></supplier></td>
                       <td><input type="text" class="form-control" id="cost" value="0.00" placeholder=""></td>
                       <td><input type="text" class="form-control" id="srp" value="0.00" placeholder=""></td>
                     </tr>

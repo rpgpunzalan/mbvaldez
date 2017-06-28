@@ -542,11 +542,11 @@ class adps_functions{
     return $ret;
   }
 
-  public function addPurchaseOrder($po_id,$po_date,$total_amount,$due_date,$status,$record_id,$discount,$shipment_no){
+  public function addPurchaseOrder($po_id,$supplier_id,$po_date,$total_amount,$due_date,$status,$record_id,$discount,$shipment_no){
     $link = $this->connect();
     $query=sprintf("INSERT INTO purchase_orders(po_id,supplier_id,po_date,total_amount,amount_paid,due_date,status,record_id,discount,shipment_no)
                     VALUES('".mysqli_real_escape_string($link,$po_id)."',
-													'".mysqli_real_escape_string($link,"1")."',
+													'".mysqli_real_escape_string($link,$supplier_id)."',
                           '".mysqli_real_escape_string($link,date_format($po_date,"Y-m-d"))."',
                           '".mysqli_real_escape_string($link,$total_amount)."',
                           '".mysqli_real_escape_string($link,"0")."',

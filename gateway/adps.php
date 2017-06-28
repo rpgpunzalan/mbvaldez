@@ -167,7 +167,7 @@
           $record_id = $db->addRecord($_SESSION['user_id']);
 					$date = date_create($_POST['po_date']);
 					$due_date = date_add($date,date_interval_create_from_date_string("2 days"));
-          $po_id = $db->addPurchaseOrder($_POST['po_id'],date_create($_POST['po_date']),$_POST['total_amount'],$due_date,1,$record_id,$_POST['discount'],$_POST['shipment_no']);
+          $po_id = $db->addPurchaseOrder($_POST['po_id'],$_POST['supplier_id'],date_create($_POST['po_date']),$_POST['total_amount'],$due_date,1,$record_id,$_POST['discount'],$_POST['shipment_no']);
           if(is_numeric($po_id)){
 						$itemList = $_POST['itemList'];
 						for($i=0;$i<count($itemList);$i++){

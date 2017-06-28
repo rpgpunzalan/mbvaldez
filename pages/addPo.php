@@ -45,22 +45,20 @@
 		        <div class="box-body">
               <div class="col-md-12">
   		        	<div>
-                  <input type="hidden" id="supplier_id" value="1" />
-                  <!-- <div class="form-group col-md-8">
+                  <div class="form-group col-md-12">
                     <div class="input-group date">
                       <div class="input-group-addon">
                         Supplier
                       </div>
                       <select class="form-control select2" id="supplier_id" style="width: 100%;" readonly>
-                        <!<option selected="selected" value="-1">Select Supplier</option>
-                        <option value="-99">New Supplier</option> >
+                        <option selected="selected" value="-1">Select Supplier</option>
                         <?php
-                          //$db->ddlSuppliers();
+                          $db->ddlSuppliers();
                         ?>
-                        <option selected="selected" value="1">Coca Cola</option>
+                        <!-- <option selected="selected" value="1">Coca Cola</option> -->
                       </select>
                     </div>
-                  </div> -->
+                  </div>
                   <div class="form-group col-md-4">
                     <div class="input-group date">
                       <div class="input-group-addon">
@@ -170,7 +168,7 @@
       dataType: 'json',
       data: {'supplier_id':$('#supplier_id').val() },
       success: function(data){
-        $('#address').val(data.supplierDetails[0].address);
+        //$('#address').val(data.supplierDetails[0].address);
         $.each(data.result, function(i,item)
         {
           $('.particulars').append("<option value='"+item.item_id+"'>"+item.item_description+"</option>");
@@ -256,9 +254,22 @@
       }else if($('#supplier_id').val()=="-1"){ //select supplier
         $('#address').val("");
       }else{
-
-
         // $('.particulars select2').append("<option></option>");
+        console.log("A")
+        $.ajax({
+          url: '../gateway/adps.php?op=getItemBySupplier',
+          type: 'post',
+          dataType: 'json',
+          data: {'supplier_id':$('#supplier_id').val() },
+          success: function(data){
+            //$('#address').val(data.supplierDetails[0].address);
+            $.each(data.result, function(i,item)
+            {
+              $('.particulars').append("<option value='"+item.item_id+"'>"+item.item_description+"</option>");
+            });
+
+          }
+        });
       }
     });
   });
@@ -276,6 +287,7 @@
         dataType: 'json',
         data: {'user_id':1,
         		'shipment_no':$('#shipment_no').val(),
+        		'supplier_id':$('#supplier_id').val(),
         		'po_id':$('#po_id').val(),
         		'po_date':$('#po_date').val(),
         		'total_amount':$('#total_amount').val(),
