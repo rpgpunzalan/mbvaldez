@@ -161,6 +161,15 @@
         break;
       }
 
+      case "searchShipment":{
+
+        if(isset($_POST['shipment_no'])){
+        	$data = $db->searchShipment($_POST['shipment_no']);
+    		echo json_encode(array("status"=>"success", "data"=>$data));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
       case "addPurchaseOrder":{
 
         if(isset($_POST['po_id'])&&isset($_POST['po_date'])&&isset($_POST['total_amount'])&&isset($_POST['itemList'])&&isset($_POST['discount'])){

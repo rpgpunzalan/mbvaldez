@@ -542,6 +542,25 @@ class adps_functions{
     return $ret;
   }
 
+  public function searchShipment($shipment_no){
+   $link = $this->connect();
+    $query = "SELECT po_id,
+                    total_amount,
+                    amount_paid,
+                    discount,
+                    po_date
+            FROM purchase_orders
+            WHERE shipment_no = '".mysqli_real_escape_string($link,$shipment_no)."'";
+    $result = mysqli_query ( $link, $query );
+    $data = array();
+   while($row =mysqli_fetch_assoc($result))
+    {
+       $data[] = $row;
+    }
+    return $data;
+
+  }
+
   public function addPurchaseOrder($po_id,$supplier_id,$po_date,$total_amount,$due_date,$status,$record_id,$discount,$shipment_no){
     $link = $this->connect();
     $query=sprintf("INSERT INTO purchase_orders(po_id,supplier_id,po_date,total_amount,amount_paid,due_date,status,record_id,discount,shipment_no)
@@ -2538,6 +2557,7 @@ class ui_functions{
 			          </a>
 			          <ul class="treeview-menu">
 			            <li><a href="purchase_orders.php"><i class="fa fa-circle-o"></i> Purchase Orders List</a></li>
+                  <li><a href="shipment.php"><i class="fa fa-circle-o"></i> Shipment</a></li>
 			            <li><a href="suppliers.php"><i class="fa fa-circle-o"></i> Supplier</a></li>
 			          </ul>
 		          </li>
