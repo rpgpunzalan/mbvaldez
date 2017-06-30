@@ -124,6 +124,9 @@
 
 <script>
 
+  var total_invoice = 0;
+  var amount_paid = [];
+
   $(function () {
      $('#payment_method').on("change",function(){
       if($('#payment_method').val()==3){
@@ -135,8 +138,6 @@
   });
 
   function searchShipment(){
-
-    var total_invoice = 0;
 
     $.ajax({
         url: '../gateway/adps.php?op=searchShipment',
@@ -165,10 +166,15 @@
                 cell4.innerHTML = "P " + data.data[i].discount;
                 cell5.innerHTML = data.data[i].po_date;
          
+                amount_paid.push(parseInt(data.data[i].amount_paid));
+
         
               }
               document.getElementById("total_invoice").innerHTML= "Total invoice: " + total_invoice;
-              console.log(total_invoice);
+              
+              console.log("TT: "+total_invoice);
+              console.log("AP: "+amount_paid);
+
               document.getElementById("addPurchase").style.display = "block";
             }else{
               $('#shipmentTable tr').not(function(){ return !!$(this).has('th').length; }).remove();
@@ -183,29 +189,36 @@
   }
 
   function recordPayment(){
-    $cc_id = -1;
-    if($('#payment_method').val()==3)
-      $cc_id = $('#cc_id').val();
-    $.ajax({
-      url: '../gateway/adps.php?op=addPayment',
-      type: 'post',
-      data:{
-        'user_id': 1,
-        'po_id': $('#modal_po_id').text(),
-        'payment_method': $('#payment_method').val(),
-        'amount': $('#amount').val(),
-        'trans_date': $('#po_date').val(),
-        'cc_id': $cc_id,
-      },
-      dataType: 'json',
-      success: function(data){
-        if(data.status=="success"){
-          window.location.replace("purchase_orders.php?recordPayment=1");
-        }else{
-          window.location.replace("purchase_orders.php?recordPayment=0");
+
+    var balance = 0;
+    
+    balance =  total_invoice - parseInt($('#payment_amount').val()) - parseInt($('#discount').val()); 
+
+    if(balance <= 0){
+
+        $cc_id = -1;
+        if($('#payment_method').val()==3)
+          $cc_id = $('#cc_id').val();
+        console.log("pota");
+        $.ajax({
+        url: '../gateway/adps.php?op=updateZeroBalance',
+        type: 'post',
+        data:{'user_id':1,
+            'shipment_no':$('#shipment_no').val()
+        },
+        dataType: 'json',
+        success: function(data){
+          if(data.status=="success"){
+            console.log("success");
+          }else{
+           console.log("failed");
+          }
         }
-      }
-    });
+      });
+    }else{
+      
+    }
+
   }
 </script>
 </body>

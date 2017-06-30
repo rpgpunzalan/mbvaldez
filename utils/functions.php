@@ -543,7 +543,7 @@ class adps_functions{
   }
 
   public function searchShipment($shipment_no){
-   $link = $this->connect();
+    $link = $this->connect();
     $query = "SELECT po_id,
                     total_amount,
                     amount_paid,
@@ -558,6 +558,19 @@ class adps_functions{
        $data[] = $row;
     }
     return $data;
+
+  }
+
+  public function updateZeroBalance($shipment_no){
+    $link = $this->connect();
+    $query=sprintf("UPDATE purchase_orders
+                    SET amount_paid = total_amount
+                    WHERE shipment_no = '".mysqli_real_escape_string($link,$shipment_no)."'");
+    $result = mysqli_query ( $link, $query );
+    
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
 
   }
 
