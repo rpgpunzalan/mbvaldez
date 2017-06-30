@@ -574,6 +574,20 @@ class adps_functions{
 
   }
 
+  public function updateBalance($shipment_no, $amount_paid, $po_id){
+    $link = $this->connect();
+    $query=sprintf("UPDATE purchase_orders
+                    SET amount_paid = '".mysqli_real_escape_string($link,$amount_paid)."'
+                    WHERE shipment_no = '".mysqli_real_escape_string($link,$shipment_no)."'
+                    and po_id = '".mysqli_real_escape_string($link,$po_id)."'");
+    $result = mysqli_query ( $link, $query );
+    
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+  }
+
   public function addPurchaseOrder($po_id,$supplier_id,$po_date,$total_amount,$due_date,$status,$record_id,$discount,$shipment_no){
     $link = $this->connect();
     $query=sprintf("INSERT INTO purchase_orders(po_id,supplier_id,po_date,total_amount,amount_paid,due_date,status,record_id,discount,shipment_no)

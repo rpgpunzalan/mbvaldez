@@ -179,6 +179,21 @@
         break;
       }
 
+      case "updateBalance":{
+
+        if(isset($_POST['shipment_no'])){
+        	
+        	$po_id = $_POST['po_id'];
+        	$new_paid = $_POST['new_paid'];
+
+        	for($i=0;$i<count($po_id);$i++){
+				$db->updateBalance($_POST['shipment_no'],$new_paid[$i],$po_id[$i]);
+			}
+    		echo json_encode(array("status"=>"success"));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
       case "addPurchaseOrder":{
 
         if(isset($_POST['po_id'])&&isset($_POST['po_date'])&&isset($_POST['total_amount'])&&isset($_POST['itemList'])&&isset($_POST['discount'])){

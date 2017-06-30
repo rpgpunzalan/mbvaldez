@@ -102,7 +102,7 @@
                         <div class="input-group-addon">
                           Discount
                         </div>
-                        <input type="text" class="form-control" id="discount" value="" />
+                        <input type="text" class="form-control" id="discount" value="0" />
                       </div>
                       <button class="btn btn-lg btn-primary col-md-12 col-sm-12 col-xs-12" onclick="recordPayment()">Record Payment</button>
                   </div>
@@ -125,6 +125,8 @@
 <script>
 
   var total_invoice = 0;
+  var po_id = [];
+  var total_amount = [];
   var amount_paid = [];
 
   $(function () {
@@ -147,7 +149,7 @@
             'shipment_no':$('#shipment_no').val()
         },
         success: function(data){
-          console.log(data);
+
           if(data.status == "success"){
             if(data.data.length > 0){
               for(var i = 0; i < data.data.length; i++){
@@ -166,14 +168,13 @@
                 cell4.innerHTML = "P " + data.data[i].discount;
                 cell5.innerHTML = data.data[i].po_date;
          
+                po_id.push(parseInt(data.data[i].po_id));
+                total_amount.push(parseInt(data.data[i].total_amount));
                 amount_paid.push(parseInt(data.data[i].amount_paid));
 
         
               }
               document.getElementById("total_invoice").innerHTML= "Total invoice: " + total_invoice;
-              
-              console.log("TT: "+total_invoice);
-              console.log("AP: "+amount_paid);
 
               document.getElementById("addPurchase").style.display = "block";
             }else{
@@ -191,15 +192,17 @@
   function recordPayment(){
 
     var balance = 0;
+
+    var new_paid = [];
+
+    var payment_amount = parseInt($('#payment_amount').val()) + parseInt($('#discount').val());
     
-    balance =  total_invoice - parseInt($('#payment_amount').val()) - parseInt($('#discount').val()); 
+    balance =  total_invoice - parseInt($('#payment_amount').val()); 
 
     if(balance <= 0){
-
         $cc_id = -1;
         if($('#payment_method').val()==3)
           $cc_id = $('#cc_id').val();
-        console.log("pota");
         $.ajax({
         url: '../gateway/adps.php?op=updateZeroBalance',
         type: 'post',
@@ -216,7 +219,44 @@
         }
       });
     }else{
+
+
+      for(var i = 0; i < total_amount.length; i++){
+
+        if(payment_amount > 0){
+          if((total_amount[i] - amount_paid[i]) <= payment_amount){
+              new_paid.push(total_amount[i] - amount_paid[i]);
+              payment_amount = payment_amount - (total_amount[i] - amount_paid[i]);
+          }else{
+              new_paid.push(payment_amount);
+              payment_amount = payment_amount - payment_amount;
+          }
+        }else{
+          new_paid.push(payment_amount);
+        }
+     }
+
+     console.log(po_id);
+     console.log(new_paid);
+
+     $.ajax({
+        url: '../gateway/adps.php?op=updateBalance',
+        type: 'post',
+        data:{'po_id':po_id,
+            'new_paid':new_paid,
+            'shipment_no':$('#shipment_no').val()
+        },
+        dataType: 'json',
+        success: function(data){
+          if(data.status=="success"){
+            console.log(data);
+          }else{
+           console.log("failed");
+          }
+        }
+      });
       
+
     }
 
   }
