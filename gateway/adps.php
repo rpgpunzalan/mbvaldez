@@ -309,6 +309,18 @@
 	      break;
 	    }
 
+	    	case "addPaymentShipment":{
+	      if(isset($_SESSION['user_id'])&&isset($_POST['payment_method'])&&isset($_POST['amount'])&&isset($_POST['trans_date'])&&isset($_POST['cc_id'])){
+					if($_POST['cc_id']!=-1){
+						$db->addCompanyCheck($_POST['cc_id'],1,date_create($_POST['trans_date']),$_POST['amount']);
+
+					}
+					$db->addPayment($_POST['payment_method'],$_POST['amount'],date_create($_POST['trans_date']),$_POST['cc_id']);
+					echo json_encode(array("status"=>"success","ccid"=>$_POST['cc_id']));
+	      }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+	      break;
+	    }
+
 			case "addPaymentSales":{
 		    if(isset($_SESSION['user_id'])&&isset($_POST['sale_id'])&&isset($_POST['payment_method'])&&isset($_POST['amount'])&&isset($_POST['trans_date'])&&isset($_POST['cc_id'])){
 		      $record_id = $db->addRecord($_SESSION['user_id']);

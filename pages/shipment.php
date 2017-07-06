@@ -141,6 +141,15 @@
 
   function searchShipment(){
 
+    total_invoice = 0;
+    po_id = [];
+    total_amount = [];
+    amount_paid = [];
+
+    $('#shipmentTable tr').not(function(){ return !!$(this).has('th').length; }).remove();
+
+    var paid = 0;
+
     $.ajax({
         url: '../gateway/adps.php?op=searchShipment',
         type: 'post',
@@ -164,6 +173,7 @@
                 cell1.innerHTML = data.data[i].po_id;
                 cell2.innerHTML = "P " + data.data[i].total_amount;
                 total_invoice = total_invoice + parseInt(data.data[i].total_amount);
+                paid = paid + parseInt(data.data[i].amount_paid);
                 cell3.innerHTML = "P " + data.data[i].amount_paid;
                 cell4.innerHTML = "P " + data.data[i].discount;
                 cell5.innerHTML = data.data[i].po_date;
@@ -174,6 +184,8 @@
 
         
               }
+
+              total_invoice = total_invoice - paid;
               document.getElementById("total_invoice").innerHTML= "Total invoice: " + total_invoice;
 
               document.getElementById("addPurchase").style.display = "block";
@@ -199,10 +211,13 @@
     
     balance =  total_invoice - parseInt($('#payment_amount').val()); 
 
+    var original = payment_amount;
+
+    console.log("total_invoice: "+total_invoice);
+    console.log("balance: "+balance);
+
     if(balance <= 0){
-        $cc_id = -1;
-        if($('#payment_method').val()==3)
-          $cc_id = $('#cc_id').val();
+        console.log("no balance");
         $.ajax({
         url: '../gateway/adps.php?op=updateZeroBalance',
         type: 'post',
@@ -212,7 +227,51 @@
         dataType: 'json',
         success: function(data){
           if(data.status=="success"){
-            console.log("success");
+            
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            if(dd<10) {
+                dd = '0'+dd
+            } 
+
+            if(mm<10) {
+                mm = '0'+mm
+            } 
+
+            today = yyyy + '-' + mm + '-' + dd;
+
+            console.log(today);
+
+              var cc_id = -1;
+              if($('#payment_method').val()==3){
+                cc_id = $('#cc_id').val();
+              }
+
+              console.log(cc_id);
+              $.ajax({
+                url: '../gateway/adps.php?op=addPaymentShipment',
+                type: 'post',
+                data:{
+                  'user_id': 1,
+                  'payment_method': $('#payment_method').val(),
+                  'amount': payment_amount,
+                  'trans_date': today,
+                  'cc_id': cc_id,
+                },
+                dataType: 'json',
+                success: function(data){
+                  if(data.status=="success"){
+                    console.log("success")
+                    //window.location.replace("shipment.php?recordPayment=1");
+                  }else{
+                    //window.location.replace("shipment.php?recordPayment=0");
+                  }
+                }
+              });
+
           }else{
            console.log("failed");
           }
@@ -220,11 +279,13 @@
       });
     }else{
 
-
+      console.log("balance");
       for(var i = 0; i < total_amount.length; i++){
 
         if(payment_amount > 0){
-          if((total_amount[i] - amount_paid[i]) <= payment_amount){
+          if(total_amount[i] == amount_paid[i]){
+              new_paid.push(amount_paid[i]);
+          }else if((total_amount[i] - amount_paid[i]) <= payment_amount){
               new_paid.push(total_amount[i] - amount_paid[i]);
               payment_amount = payment_amount - (total_amount[i] - amount_paid[i]);
           }else{
@@ -249,7 +310,48 @@
         dataType: 'json',
         success: function(data){
           if(data.status=="success"){
-            console.log(data);
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            if(dd<10) {
+                dd = '0'+dd
+            } 
+
+            if(mm<10) {
+                mm = '0'+mm
+            } 
+
+            today = yyyy + '-' + mm + '-' + dd;
+
+            console.log(today);
+
+              var cc_id = -1;
+              if($('#payment_method').val()==3){
+                cc_id = $('#cc_id').val();
+              }
+
+              console.log("amount: " + payment_amount);
+              $.ajax({
+                url: '../gateway/adps.php?op=addPaymentShipment',
+                type: 'post',
+                data:{
+                  'user_id': 1,
+                  'payment_method': $('#payment_method').val(),
+                  'amount': original,
+                  'trans_date': today,
+                  'cc_id': cc_id,
+                },
+                dataType: 'json',
+                success: function(data){
+                  if(data.status=="success"){
+                    //window.location.replace("shipment.php?recordPayment=1");
+                  }else{
+                    //window.location.replace("shipment.php?recordPayment=0");
+                  }
+                }
+              });
           }else{
            console.log("failed");
           }
