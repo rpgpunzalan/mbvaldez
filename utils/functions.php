@@ -1341,6 +1341,7 @@ class adps_functions{
     $result = mysqli_query ( $link, $query );
 		print "<tbody>";
 		$total = 0;
+    $index = 0;
    while($row =mysqli_fetch_assoc($result))
     {
        print "
@@ -1351,6 +1352,7 @@ class adps_functions{
 				</tr>
 			 ";
 			 $total += $row['bal'];
+       $index++;
     }
 		print "</tbody>
 		<tfooter>
@@ -1362,6 +1364,37 @@ class adps_functions{
 		";
 
     return number_format($total,2);
+  }
+
+  public function cds($d1,$d2){
+    $link = $this->connect();
+    $query = "SELECT c.customer_name, 
+      s.sale_date,
+      s.total_amount,
+      si.quantity,
+      i.item_description,
+      r.total_amount AS total
+    FROM sales s, customers c, sale_items si, returns r, return_items ri, items i
+    WHERE s.customer_id = c.customer_id and s.sale_id = si.sale_id and r.customer_id = s.customer_id and r.return_id = ri.return_id and ri.item_id = i.item_id and s.sale_date BETWEEN '".$d1."' AND '".$d2."' ";
+    
+    $result = mysqli_query ( $link, $query );
+    print "<tbody>";
+
+    $index = 0;
+   while($row =mysqli_fetch_assoc($result))
+    {
+       print "
+        <tr id='cdsValue".$index."'>
+          <td id='cname".$index."'>".$row['customer_name']."</td>
+          <td id='sdate".$index."'>".$row['sale_date']."</td>
+          <td id='squantity".$index."'>".$row['quantity']."</td>
+          <td id='samount".$index."'>".$row['total_amount']."</td>
+          <td id='desc".$index."'>".$row['item_description']."</td>
+          <td id='tamount".$index."'>".$row['total']."</td>
+        </tr>
+       ";
+       $index++;
+    }
   }
 
 	public function weeklyPayables($d1, $d2){
@@ -2610,7 +2643,6 @@ class ui_functions{
 			          <ul class="treeview-menu">
 			            <li><a href="sales.php"><i class="fa fa-circle-o"></i> Sales List</a></li>
 			            <li><a href="customers.php"><i class="fa fa-circle-o"></i> Customers</a></li>
-
 			          </ul>
 		          </li>
 							';if($active==5) print'
@@ -2649,6 +2681,7 @@ class ui_functions{
 			            <li><a href="incomestatement.php"><i class="fa fa-circle-o"></i> Income Statement</a></li>
 			            <li><a href="inventoryreport.php"><i class="fa fa-circle-o"></i> Inventory Report</a></li>
                   <li><a href="payablecollectible.php"><i class="fa fa-circle-o"></i> Payables and Collectibles</a></li>
+                  <li><a href="customerdeliverysheet.php"><i class="fa fa-circle-o"></i> Customer Delivery Sheet</a></li>
 			          </ul>
 		          </li>';
 							}

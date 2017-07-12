@@ -143,6 +143,7 @@
             newRow.push(cells[ic].innerHTML);
         }
         payableRows.push(newRow);
+        newRow = [];
     }
 
     var doc = new jsPDF();
@@ -178,6 +179,7 @@
             newRow.push(cells[ic].innerHTML);
         }
         collectibleRows.push(newRow);
+        newRow = [];
     }
 
     var doc = new jsPDF();

@@ -15,7 +15,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <?php $ui->showHeadHTML("Inventory Report");?>
+  <?php $ui->showHeadHTML("Customer Delivery Sheet");?>
   <script type="text/javascript" src="../assets/dist/jspdf.debug.js"></script>
   <script type="text/javascript" src="../assets/dist/jspdf.plugin.autotable"></script>
 </head>
@@ -27,7 +27,7 @@
   ?>
   <section class="content-header">
     <h1>
-      Inventory Report
+      Customer Delivery Sheet
     </h1>
   </section>
   <!-- CONTENT HERE -->
@@ -64,7 +64,7 @@
         if(isset($_GET['d1'])&&isset($_GET['d2'])){
 
         ?>
-          <input type="hidden" value="2017-01-01" id="startDate" />
+          <input type="hidden" value="<?php echo $d1; ?>" id="startDate" />
           <input type="hidden" value="<?php echo $d2; ?>" id="endDate" />
         <?php
         }
@@ -72,36 +72,41 @@
         <div class="box box-success">
           <div class="box-header with-border">
             <div class="form-group">
-              <label>Until Date:</label>
+              <label>Date range:</label>
 
               <div class="input-group">
                 <div class="input-group-addon">
                   <i class="fa fa-calendar"></i>
                 </div>
-                <input type="date" class="form-control pull-right" id="untilDate">
+                <input type="text" class="form-control pull-right" id="dateRange">
               </div>
               <!-- /.input group -->
             </div>
-            <button type="button" class="btn" onclick="myFunction()">Generate Inventory Report</button>
+            <button type="button" class="btn" onclick="myFunction()">Generate</button>
           </div>
 
           </div>
           <div class="table-bordered">
-            <table class="table" id="inventoryTable">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-              <?php $total = $db->getInventoryReport($d1,$d2); ?>
-          </table>
+            <table class="table" id="cds">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Quantity</th>
+                  <th>Amount</th>
+                  <th>Return Item</th>
+                  <th>Return Amount</th>
+                </tr>
+              </thead>
+                <?php
+                  $db->cds($d1,$d2);
+                ?>
+            </table>
           </div>
+          <button type="button" class="btn" onclick="exportAsPDF()">Export PDF</button>
         </div>
         <!-- /.nav-tabs-custom -->
-        <button type="button" class="btn" onclick="exportAsPDF()">Export PDF</button>
+
       <!-- /.Left col -->
     <!-- /.row (main row) -->
   </section>
@@ -112,28 +117,21 @@
 ?>
 <script>
 
-  var inventoryRow = [];
+  var cdsRows = [];
   var newRow = [];
+
 
   function exportAsPDF(){
     var date1 = "<?php print $d1; ?>";
     var date2 = "<?php print $d2; ?>";
-    var columns = ["Item", "In", "Out", "Total"];
-    var tbl = document.getElementById("inventoryTable");
 
-
-    var doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.text(70, 20, 'MBValdez Distribution');
-    doc.setFontSize(18);
-    doc.text(83, 30, 'Inventory Report');
-
-    var total = "<?php print $total; ?>";
+    var columns = ["Customer", "Date", "Quantity", "Amount", "Return Item", "Return Amount"];
+    var tbl = document.getElementById("cds");
 
     var numRows = tbl.rows.length;
-    
-    for (var i = 1; i < numRows-1; i++) {
-        var ID = tbl.rows[i].id;
+    console.log(numRows);
+    for (var i = 1; i < numRows; i++) {
+        //var ID = tbl.rows[i].id;
         var cells = tbl.rows[i].getElementsByTagName('td');
         for (var ic=0,it=cells.length;ic<it;ic++) {
             // alert the table cell contents
@@ -141,68 +139,89 @@
             // it SUPER-obvious  that it works :)
             newRow.push(cells[ic].innerHTML);
         }
-        inventoryRow.push(newRow);
+        cdsRows.push(newRow);
         newRow = [];
     }
 
-    doc.setFontSize(16);
-    doc.text(20, 45, 'Total Amount: '+total);
+    var doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.text(70, 20, 'MBValdez Distribution');
+    doc.setFontSize(18);
+    doc.text(73, 30, 'Customer Deliver Sheet');
 
-    doc.autoTable(columns, inventoryRow, {
+    doc.autoTable(columns, cdsRows, {
         margin: {top: 55, left:20},
     });
 
-    doc.save('InventoryReport:' + date1 + 'to' + date2 +'.pdf');
+    doc.save('CDS:' + date1 + 'to' + date2 +'.pdf');
   }
+
   $('#loader').css("display","none");
   var startDate,endDate,dataParam;
 
-    function myFunction() {
-      // console.log();
-      $('#loader').css("display","block");
-    dataParam = {"d1":startDate,"d2":endDate};
-    window.location.href = "inventoryreport.php?d1=2017-01-01&d2="+$('#untilDate').val();
-    //console.log(dataParam);
-      //  $.ajax({
-      //     url: '../gateway/adps.php?op=getInventoryReport',
-      //     type: 'get',
-      //     dataType: 'json',
-      //     data:dataParam,
-      //     success: function(data){
-       //
-      //       /*console.log(data.res[0].item_description);*/
-      //       //console.log(data.items[0].item_description);
-       //
-      //       $('#inventoryTable tr').not(function(){ return !!$(this).has('th').length; }).remove();
-       //
-      //       console.log("hello");
-       //
-      //       for(var i = data.res.length-1; i >= 0; i--){
-      //         var table = document.getElementById("inventoryTable");
-      //         var row = table.insertRow(1);
-      //         var cell1 = row.insertCell(0);
-      //         var cell2 = row.insertCell(1);
-      //         var cell3 = row.insertCell(2);
-      //         var cell4 = row.insertCell(3);
-      //         var cell5 = row.insertCell(4);
-      //
-      //
-      //         for(var j = 0; j < data.items.length; j++){
-      //           if(data.res[i].item_id == data.items[j].item_id){
-      //             cell1.innerHTML = data.items[j].item_description;
-      //           }
-      //         }
-      //         cell2.innerHTML = data.res[i].cost;
-      //         cell3.innerHTML = data.res[i].quantity;
-      //         cell4.innerHTML = "P " + data.res[i].quantity * data.res[i].cost;
-      //         cell5.innerHTML = data.res[i].trans_date;
-       //
-      //
-      //       }
-       //
-      //     }
-      //   });
+  var netsales, cost, grossprofit, expenses, operating_income, net_income;
+
+  function myFunction() {
+    $('#loader').css("display","block");
+    window.location.href="customerdeliverysheet.php?d1="+startDate+"&d2="+endDate;
   }
+  //
+  //   dataParam = {"d1":startDate,"d2":endDate};
+  //
+  //   $.ajax({
+  //     url: '../gateway/adps.php?op=getIncomeStatement',
+  //     type: 'get',
+  //     dataType: 'json',
+  //     data:dataParam,
+  //     success: function(data){
+  //
+  //       if(data.netsales == null){
+  //         netsales = 0;
+  //       }else{
+  //         netsales = data.netsales;
+  //       }
+  //
+  //       if(data.cost == null){
+  //         cost = 0;
+  //       }else{
+  //         cost = data.cost;
+  //       }
+  //
+  //       if(data.expenses == null){
+  //         expenses = 0;
+  //       }else{
+  //         expenses = data.expenses;
+  //       }
+  //
+  //       grossprofit = netsales - cost;
+  //       net_income = grossprofit - expenses;
+  //
+  //       var row = document.getElementById("monthyear");
+  //       var x = row.insertCell(1);
+  //       x.innerHTML = startDate + " to " + endDate;
+  //
+  //       var row = document.getElementById("netsales");
+  //       var x = row.insertCell(1);
+  //       x.innerHTML = "P " + netsales;
+  //
+  //       var row = document.getElementById("cost");
+  //       var x = row.insertCell(1);
+  //       x.innerHTML = "P " + cost;
+  //
+  //       var row = document.getElementById("grossprofit");
+  //       var x = row.insertCell(1);
+  //       x.innerHTML = "P " + grossprofit;
+  //
+  //       var row = document.getElementById("expenses");
+  //       var x = row.insertCell(1);
+  //       x.innerHTML = "P " + expenses;
+  //
+  //       var row = document.getElementById("net_income");
+  //       var x = row.insertCell(1);
+  //       x.innerHTML = "P " + net_income;
+  //
+  //     }
+  //   });
 
   $(document).ready(function(){
 
