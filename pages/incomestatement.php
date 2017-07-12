@@ -16,6 +16,8 @@
 <html>
 <head>
   <?php $ui->showHeadHTML("Income Statement");?>
+  <script type="text/javascript" src="../assets/dist/jspdf.debug.js"></script>
+  <script type="text/javascript" src="../assets/dist/jspdf.plugin.autotable"></script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
@@ -118,6 +120,7 @@
               </tbody>
             </table>
           </div>
+          <button type="button" class="btn" onclick="exportAsPDF()">Export PDF</button>
         </div>
         <!-- /.nav-tabs-custom -->
 
@@ -130,6 +133,55 @@
   $ui->externalScripts();
 ?>
 <script>
+
+  function exportAsPDF(){
+    var date1 = "<?php print $d1; ?>";
+    var date2 = "<?php print $d2; ?>";
+    var sales = "<?php print print number_format($sales,2); ?>";
+    var cos = "<?php print print number_format($cos,2);; ?>";
+    var gp = "<?php print number_format($sales-$cos,2); ?>";
+    var expenses = "<?php print number_format($expenses,2); ?>";
+    var netincome = "<?php print number_format(($sales-$cos)-$expenses,2); ?>";
+
+    var doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.text(70, 20, 'MBValdez Distribution');
+    doc.setFontSize(18);
+    doc.text(73, 30, 'Income Statement Report');
+
+    doc.setFontSize(16);
+    doc.text(20, 60, 'Duration: ');
+    doc.setFontSize(14);
+    doc.text(70, 60, date1 + ' to ' + date2);
+
+    doc.setFontSize(16);
+    doc.text(20, 70, 'Sales: ');
+    doc.setFontSize(14);
+    doc.text(70, 70, sales);
+
+    doc.setFontSize(16);
+    doc.text(20, 80, 'Cost of Sales: ');
+    doc.setFontSize(14);
+    doc.text(70, 80, cos);
+
+    doc.setFontSize(16);
+    doc.text(20, 90, 'Gross Profit: ');
+    doc.setFontSize(14);
+    doc.text(70, 90, gp);
+
+    doc.setFontSize(16);
+    doc.text(20, 100, 'Expenses: ');
+    doc.setFontSize(14);
+    doc.text(70, 100, expenses);
+
+    doc.setFontSize(16);
+    doc.text(20, 110, 'Net Income/Loss: ');
+    doc.setFontSize(14);
+    doc.text(70, 110, netincome);
+
+    doc.save('IncomeStatement:' + date1 + 'to' + date2 +'.pdf');
+  }
+
   $('#loader').css("display","none");
   var startDate,endDate,dataParam;
 
