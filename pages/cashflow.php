@@ -164,6 +164,11 @@
 ?>
 <script>
 
+  function myFunction() {
+    $('#loader').css("display","block");
+    window.location.href="incomestatement.php?d1="+startDate+"&d2="+endDate;
+  }
+
   $(document).ready(function(){
     var startDate,endDate,dataParam;
 

@@ -11,6 +11,8 @@
 <html>
 <head>
   <?php $ui->showHeadHTML("Cashflow"); ?>
+  <script type="text/javascript" src="../assets/dist/jspdf.debug.js"></script>
+  <script type="text/javascript" src="../assets/dist/jspdf.plugin.autotable"></script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <input type="hidden" id="cf_date" value="<?php print $cf_date; ?>" />
@@ -87,7 +89,8 @@
               </div>
               <!-- /.box-body -->
             </div>
-          </div>
+            <button type="button" class="btn" onclick="exportAsPDF()">Export PDF</button>
+          </div>         
         </div>
       </div>
       </section>
@@ -98,6 +101,54 @@
   $ui->externalScripts();
 ?>
 <script>
+
+  var inflowTotal = 0;
+  var outflowTotal = 0;
+
+  
+  var columns = ["Particulars", "Amount"];
+  var inflowRows = [];
+  var outflowRows = [];
+  var newParticular = [];
+
+  function exportAsPDF(){
+    var date = "<?php print $cf_date; ?>";
+
+    var doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.text(70, 20, 'MBValdez Distribution');
+    doc.setFontSize(18);
+    doc.text(65, 30, 'Cashflow Report - '+date);
+
+    doc.setFontSize(16);
+    doc.text(20, 50, 'INFLOW');
+
+    doc.setFontSize(14);
+    doc.text(20, 60, 'Total Amount: '+inflowTotal);
+
+    doc.autoTable(columns, inflowRows, {
+        margin: {top: 65, left:20},
+    });
+
+    doc.addPage();
+
+    doc.setFontSize(22);
+    doc.text(70, 20, 'MBValdez Distribution');
+    doc.setFontSize(18);
+    doc.text(65, 30, 'Cashflow Report - '+date);
+
+    doc.setFontSize(16);
+    doc.text(20, 50, 'OUTFLOW');
+
+    doc.setFontSize(14);
+    doc.text(20, 60, 'Total Amount: '+outflowTotal);
+
+    doc.autoTable(columns, outflowRows, {
+        margin: {top: 65, left:20},
+    });
+
+    doc.save('Cashflow:'+date+'.pdf');
+  }
   $(function () {
     $.ajax({
       url: '../gateway/adps.php?op=getCashflowListByDate',
@@ -119,17 +170,25 @@
           else outflowTotal += parseFloat(cfDetails.amount);
         });
         $('#total_amount').html(parseFloat(totamt).toFixed(2));
+        inflowTotal = parseFloat(totamt).toFixed(2);
         $('#outflowTotal').html(parseFloat(outflowTotal).toFixed(2));
+        outflowTotal = parseFloat(outflowTotal).toFixed(2);
         $.each(data.result, function(i,item)
         {
           if(item.category==2){
             $('#cf_items tbody').html($('#cf_items tbody').html()+
                                               "<tr><td>"+item.particulars+
                                               "</td><td>"+parseFloat(item.amount).toFixed(2)+"</td></tr>");
+            newParticular.push(item.particulars);
+            newParticular.push(parseFloat(item.amount).toFixed(2));
+            inflowRows.push(newParticular);
           }else{
             $('#outflowTable tbody').html($('#outflowTable tbody').html()+
                                               "<tr><td>"+item.particulars+
                                               "</td><td>"+parseFloat(item.amount).toFixed(2)+"</td></tr>");
+            newParticular.push(item.particulars);
+            newParticular.push(parseFloat(item.amount).toFixed(2));
+            outflowRows.push(newParticular);
           }
 
         });

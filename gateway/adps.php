@@ -1,6 +1,7 @@
 <?php
 	session_start();
 	include '../utils/functions.php';
+	
 	$db = new adps_functions();
 	// $db->sec_session_start(); // Our custom secure way of starting a PHP session.
   if(isset($_GET['op'])){
