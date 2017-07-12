@@ -1233,16 +1233,18 @@ class adps_functions{
 							ORDER BY po.due_date DESC";
     $result = mysqli_query ( $link, $query );
 		print "<tbody>";
-		$total=0;
+		$total = 0;
+    $index = 0;
    while($row =mysqli_fetch_assoc($result))
     {
        print "
-			 	<tr>
-					<td>".$row['supplier_name']."</td>
-					<td>".$row['due_date']."</td>
-					<td>".number_format($row['bal'],2)."</td>
+			 	<tr id='payableValue".$index."'>
+					<td id='supplier".$index."'>".$row['supplier_name']."</td>
+					<td id='date".$index."'>".$row['due_date']."</td>
+					<td id='bal".$index."'>".number_format($row['bal'],2)."</td>
 				</tr>
 			 ";
+       $index++;
 			 $total+=$row['bal'];
     }
 		print "</tbody>
@@ -1253,6 +1255,7 @@ class adps_functions{
 			</tr>
 		</tfooter>
 		";
+    return number_format($total,2);
   }
 	public function getSupplierPayables($supplier_id){
     $link = $this->connect();
@@ -1354,6 +1357,8 @@ class adps_functions{
 			</tr>
 		</tfooter>
 		";
+
+    return number_format($total,2);
   }
 
 	public function weeklyPayables($d1, $d2){

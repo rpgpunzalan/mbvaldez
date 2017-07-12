@@ -13,6 +13,8 @@
 <html>
 <head>
   <?php $ui->showHeadHTML("Payable and Collectible Report");?>
+  <script type="text/javascript" src="../assets/dist/jspdf.debug.js"></script>
+  <script type="text/javascript" src="../assets/dist/jspdf.plugin.autotable"></script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
@@ -63,7 +65,7 @@
           <div class="tab-content no-padding">
             <!-- Morris chart - Sales -->
             <div class="table-bordered">
-          <table class="table" id="payablecollectibleTable">
+          <table class="table" id="payableTable">
           <thead>
             <tr>
               <th>Supplier</th>
@@ -72,14 +74,15 @@
             </tr>
           </thead>
             <?php
-              $db->allPayables();
+              $total = $db->allPayables();
             ?>
         </table>
         </div>
           </div>
+
         </div>
         <!-- /.nav-tabs-custom -->
-
+        <button type="button" class="btn" onclick="exportAsPDF1()">Export PDF</button>
       </section>
 
       <section class="col-lg-6 connectedSortable">
@@ -92,7 +95,7 @@
           <div class="tab-content no-padding">
             <!-- Morris chart - Sales -->
             <div class="table-bordered">
-          <table class="table" id="payablecollectibleTable">
+          <table class="table" id="collectibleTable">
           <thead>
             <tr>
               <th>Customer</th>
@@ -101,14 +104,14 @@
             </tr>
           </thead>
             <?php
-              $db->allCollectibles();
+              $total2 = $db->allCollectibles();
             ?>
         </table>
         </div>
           </div>
         </div>
         <!-- /.nav-tabs-custom -->
-
+        <button type="button" class="btn" onclick="exportAsPDF2()">Export PDF</button>
       </section>
     </div>
   </section>
@@ -118,6 +121,81 @@
   $ui->externalScripts();
 ?>
 <script>
+
+  var payableRows = [];
+  var collectibleRows = [];
+  var newRow = [];
+
+  function exportAsPDF1(){
+    var columns = ["Supplier", "Due Date", "Amount"];
+    var tbl = document.getElementById("payableTable");
+    var total = "<?php print $total; ?>";
+
+    var numRows = tbl.rows.length;
+    console.log(numRows);
+    for (var i = 1; i < numRows-1; i++) {
+        var ID = tbl.rows[i].id;
+        var cells = tbl.rows[i].getElementsByTagName('td');
+        for (var ic=0,it=cells.length;ic<it;ic++) {
+            // alert the table cell contents
+            // you probably do not want to do this, but let's just make
+            // it SUPER-obvious  that it works :)
+            newRow.push(cells[ic].innerHTML);
+        }
+        payableRows.push(newRow);
+    }
+
+    var doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.text(70, 20, 'MBValdez Distribution');
+    doc.setFontSize(18);
+    doc.text(82, 30, 'Payables Report');
+
+    doc.setFontSize(16);
+    doc.text(20, 45, 'Total Amount: '+total);
+
+    doc.autoTable(columns, payableRows, {
+        margin: {top: 55, left:20},
+    });
+
+    doc.save('PayablesReport.pdf');
+  }
+
+  function exportAsPDF2(){
+    var columns = ["Customer", "Due Date", "Amount"];
+    var tbl = document.getElementById("collectibleTable");
+    var total = "<?php print $total2; ?>";
+
+    var numRows = tbl.rows.length;
+    console.log(numRows);
+    for (var i = 1; i < numRows-1; i++) {
+        var ID = tbl.rows[i].id;
+        var cells = tbl.rows[i].getElementsByTagName('td');
+        for (var ic=0,it=cells.length;ic<it;ic++) {
+            // alert the table cell contents
+            // you probably do not want to do this, but let's just make
+            // it SUPER-obvious  that it works :)
+            newRow.push(cells[ic].innerHTML);
+        }
+        collectibleRows.push(newRow);
+    }
+
+    var doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.text(70, 20, 'MBValdez Distribution');
+    doc.setFontSize(18);
+    doc.text(82, 30, 'Collectibles Report');
+
+    doc.setFontSize(16);
+    doc.text(20, 45, 'Total Amount: '+total);
+
+    doc.autoTable(columns, collectibleRows, {
+        margin: {top: 55, left:20},
+    });
+
+    doc.save('CollectiblesReport.pdf');
+  }
+
   $('#loader').css("display","none");
   var startDate,endDate,dataParam;
 
