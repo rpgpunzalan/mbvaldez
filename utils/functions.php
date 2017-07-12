@@ -1164,20 +1164,22 @@ class adps_functions{
 		$result = mysqli_query ( $link, $query );
 		print "<tbody>";
 		$total=0;
+    $index=0;
 		while($row =mysqli_fetch_assoc($result))
 		{
 			$out = 0;
 			$in = 0;
 			if($row['out']) $out = $row['out'];
 			if($row['in']) $in = $row['in'];
-			print "<tr>
-				<td>".$row['item_description']."</td>
-				<td>".number_format($in,0)."</td>
-				<td>".number_format($out,0)."</td>
-				<td>".number_format($row['total'],0)."</td>
+			print "<tr id='inventory".$index."'>
+				<td id='desc".$index."'>".$row['item_description']."</td>
+				<td id='in".$index."'>".number_format($in,0)."</td>
+				<td id='out".$index."'>".number_format($out,0)."</td>
+				<td id='total".$index."'>".number_format($row['total'],0)."</td>
 			</tr>";
 			$total += $row['total']*$row['cost'];
-		}
+		  $index++;
+    }
 		print "</tbody>
 		<tfooter>
 			<tr>
@@ -1186,6 +1188,7 @@ class adps_functions{
 			</tr>
 		</tfooter>
 		";
+    return number_format($total,2);
 	}
 
   public function getInventoryReportQuantity($d1, $d2){
@@ -1341,10 +1344,10 @@ class adps_functions{
    while($row =mysqli_fetch_assoc($result))
     {
        print "
-			 	<tr>
-					<td>".$row['customer_name']."</td>
-					<td>".$row['due_date']."</td>
-					<td>".number_format($row['bal'],2)."</td>
+			 	<tr id='collectibleValue".$index."'>
+					<td id='customer".$index."'>".$row['customer_name']."</td>
+					<td id='date".$index."'>".$row['due_date']."</td>
+					<td id='bal".$index."'>".number_format($row['bal'],2)."</td>
 				</tr>
 			 ";
 			 $total += $row['bal'];

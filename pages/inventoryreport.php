@@ -16,6 +16,8 @@
 <html>
 <head>
   <?php $ui->showHeadHTML("Inventory Report");?>
+  <script type="text/javascript" src="../assets/dist/jspdf.debug.js"></script>
+  <script type="text/javascript" src="../assets/dist/jspdf.plugin.autotable"></script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
@@ -94,12 +96,12 @@
                 <th>Total</th>
               </tr>
             </thead>
-              <?php $db->getInventoryReport($d1,$d2); ?>
+              <?php $total = $db->getInventoryReport($d1,$d2); ?>
           </table>
           </div>
         </div>
         <!-- /.nav-tabs-custom -->
-
+        <button type="button" class="btn" onclick="exportAsPDF()">Export PDF</button>
       <!-- /.Left col -->
     <!-- /.row (main row) -->
   </section>
@@ -109,6 +111,48 @@
   $ui->externalScripts();
 ?>
 <script>
+
+  var inventoryRow = [];
+  var newRow = [];
+
+  function exportAsPDF(){
+    var date1 = "<?php print $d1; ?>";
+    var date2 = "<?php print $d2; ?>";
+    var columns = ["Item", "In", "Out", "Total"];
+    var tbl = document.getElementById("inventoryTable");
+
+
+    var doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.text(70, 20, 'MBValdez Distribution');
+    doc.setFontSize(18);
+    doc.text(83, 30, 'Inventory Report');
+
+    var total = "<?php print $total; ?>";
+
+    var numRows = tbl.rows.length;
+    
+    for (var i = 1; i < numRows-1; i++) {
+        var ID = tbl.rows[i].id;
+        var cells = tbl.rows[i].getElementsByTagName('td');
+        for (var ic=0,it=cells.length;ic<it;ic++) {
+            // alert the table cell contents
+            // you probably do not want to do this, but let's just make
+            // it SUPER-obvious  that it works :)
+            newRow.push(cells[ic].innerHTML);
+        }
+        inventoryRow.push(newRow);
+    }
+
+    doc.setFontSize(16);
+    doc.text(20, 45, 'Total Amount: '+total);
+
+    doc.autoTable(columns, inventoryRow, {
+        margin: {top: 55, left:20},
+    });
+
+    doc.save('InventoryReport:' + date1 + 'to' + date2 +'.pdf');
+  }
   $('#loader').css("display","none");
   var startDate,endDate,dataParam;
 
