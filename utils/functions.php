@@ -608,6 +608,19 @@ class adps_functions{
 
   }
 
+  public function removeEmpty($supplier_id){
+    $link = $this->connect();
+    $query=sprintf("DELETE FROM return_empty
+                    WHERE item_id 
+                    IN (SELECT item_id FROM items 
+                    WHERE supplier_id = '".mysqli_real_escape_string($link,$supplier_id)."')");
+
+    if (!mysqli_query($link, $query)) {
+        return mysqli_error($link);
+    }else return true;
+
+  }
+
   public function editPurchaseOrder($po_id,$supplier_id,$po_date,$total_amount,$amount_paid,$terms,$due_date,$payment_method,$status,$cc_id,$record_id){
     $link = $this->connect();
     $query=sprintf("UPDATE purchase_orders
