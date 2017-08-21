@@ -608,6 +608,53 @@ class adps_functions{
 
   }
 
+  public function editPO($po_id,$new_amount,$new_quantity,$item_id){
+    $link = $this->connect();
+    $query=sprintf("UPDATE purchase_order_items
+                    SET quantity = '".mysqli_real_escape_string($link,$new_quantity)."',
+                    cost = '".mysqli_real_escape_string($link,$new_amount)."'
+                    WHERE po_id = '".mysqli_real_escape_string($link,$po_id)."' AND item_id = '".mysqli_real_escape_string($link,$item_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editSupplier($supplier_id,$new_name,$new_address,$new_contact){
+    $link = $this->connect();
+    $query=sprintf("UPDATE suppliers
+                    SET supplier_name = '".mysqli_real_escape_string($link,$new_name)."',
+                    address = '".mysqli_real_escape_string($link,$new_address)."',
+                    contact_number = '".mysqli_real_escape_string($link,$new_contact)."'
+                    WHERE supplier_id = '".mysqli_real_escape_string($link,$supplier_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editCustomer($supplier_id,$new_name,$new_address,$new_contact){
+    $link = $this->connect();
+    $query=sprintf("UPDATE customers
+                    SET customer_name = '".mysqli_real_escape_string($link,$new_name)."',
+                    address = '".mysqli_real_escape_string($link,$new_address)."',
+                    contact_no = '".mysqli_real_escape_string($link,$new_contact)."'
+                    WHERE customer_id = '".mysqli_real_escape_string($link,$supplier_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
   public function removeEmpty($supplier_id){
     $link = $this->connect();
     $query=sprintf("DELETE FROM return_empty
@@ -2113,6 +2160,7 @@ class adps_functions{
     $link = $this->connect();
     $query = "SELECT p.po_id,
                     i.item_description,
+                    i.item_id,
                     p.quantity,
                     p.cost
               FROM  purchase_order_items p

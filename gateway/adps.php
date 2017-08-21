@@ -217,6 +217,41 @@
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;
       }
+
+      case "editPurchaseOrder":{
+
+        if(isset($_POST['po_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editPO($_POST['po_id'],$_POST['new_amount'],$_POST['new_quantity'],$_POST['item_id']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+      case "editSupplier":{
+
+        if(isset($_POST['supplier_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editSupplier($_POST['supplier_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+      case "editCustomer":{
+
+        if(isset($_POST['customer_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editCustomer($_POST['customer_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+
 			case "getPurchaseOrderById": {
 				if(isset($_GET['po_id'])){
 						$items = $db->getPOItems($_GET['po_id']);
