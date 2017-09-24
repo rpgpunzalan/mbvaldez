@@ -98,7 +98,7 @@
                       <th width="20%">Total</th>
                     </thead>
                     <?php
-                    for($i=0;$i<10;$i++){
+                    for($i=0;$i<50;$i++){
                     ?>
                       <tr>
                         <td><select class="form-control select2 particulars" style="width: 100%;">
@@ -115,12 +115,20 @@
                   </table>
                 </div>
                 <div class="form-group">
-                  <div class="form-group col-md-6">
+                  <div class="form-group col-md-3">
                     <div class="input-group">
                       <div class="input-group-addon">
                         Discount
                       </div>
                       <input type="text" id="discount" class="form-control" value="0.00" />
+                    </div>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <div class="input-group">
+                      <div class="input-group-addon">
+                        Total Cases
+                      </div>
+                      <input type="text" id="totalcases" class="form-control" value="0.00" />
                     </div>
                   </div>
 
@@ -161,6 +169,13 @@
     }
     return tot;
   }
+  function computeTotalCases(){
+    var tot = 0;
+    for(let i=0;i<$('.quantity').length;i++){
+      tot = parseFloat($('.quantity')[i].value) + tot;
+    }
+    return tot;
+  }
   $(function () {
     $.ajax({
       url: '../gateway/adps.php?op=getItemBySupplier',
@@ -197,6 +212,7 @@
         $('.total')[ind].value = ($('.quantity')[ind].value*$('.amount')[ind].value).toFixed(2);
       }
       $('#total_amount').val(computeTotal()-$('#discount').val());
+      $('#totalcases').val(computeTotalCases());
     });
     $('.amount').on("keyup",function(){
       var ind = ($(this)).index('.amount');
@@ -204,9 +220,11 @@
         $('.total')[ind].value = ($('.quantity')[ind].value*$('.amount')[ind].value).toFixed(2);
       }
       $('#total_amount').val(computeTotal()-$('#discount').val());
+      $('#totalcases').val(computeTotalCases());
     });
     $('#discount').on("keyup",function(){
       $('#total_amount').val(computeTotal()-$('#discount').val());
+      $('#totalcases').val(computeTotalCases());
     });
 
     $('.particulars').on("change",function(){
@@ -277,7 +295,7 @@
   function addPurchase(){
 
     var itemList = [];
-    for(let i=0;i<10;i++){
+    for(let i=0;i<50;i++){
       if($('.particulars')[i].value != "-1")
         itemList.push([$('.particulars')[i].value,$('.quantity')[i].value,$('.amount')[i].value]);
     }

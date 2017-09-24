@@ -50,7 +50,8 @@ session_start();
             </thead>
             <tbody>
               <?php
-                $db->weeklyPayables(date( 'Y-m-d', strtotime( 'monday this week' ) ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
+                // $db->weeklyPayables(date( 'Y-m-d', strtotime( 'monday this week' ) ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
+              $db->weeklyPayables(date( "2017-01-01" ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
               ?>
             </tbody>
           </table>
@@ -80,7 +81,8 @@ session_start();
             </thead>
             <tbody>
               <?php
-                $db->weeklyCollectibles(date( 'Y-m-d', strtotime( 'monday this week' ) ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
+                // $db->weeklyCollectibles(date( 'Y-m-d', strtotime( 'monday this week' ) ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
+              $db->weeklyCollectibles(date( "2017-01-01" ),date( 'Y-m-d', strtotime( 'sunday this week' ) ));
               ?>
             </tbody>
           </table>

@@ -51,42 +51,22 @@
 		        </div>
 		        <div class="box-body">
               <div class="col-md-12">
-  		        	<div>
-                  <!-- <input type="hidden" id="customer_id" value="1" /> -->
-                  <div class="form-group col-md-8">
-                    <div class="input-group date">
-                      <div class="input-group-addon">
-                        Customer
-                      </div>
-                      <select class="form-control select2" id="customer_id" style="width: 100%;" readonly>
-                        <option selected="selected" value="-1">Select Customer</option>
-                        <option value="-99">New Customer</option>
-                        <?php
-                          $db->ddlCustomers();
-                        ?>
-                      </select>
-                    </div>
-                  </div>
-                </div>
+
   		        	<div>
                   <div class="form-group col-md-4">
                     <div class="input-group date">
-                      <div class="input-group-addon">
-                        Sale Number
-                      </div>
-                      <input type="text" class="form-control" id="sale_id" />
+                      <!-- <input type="text" class="form-control" id="sale_id" /> -->
+                      <select id="sid" class="select2">
+                        <option selected="selected" value="-1">Select Sale ID</option>
+                        <?php $db->ddlSaleNumbers(); ?>
+                      </select>
+                      <input type="hidden" id="sale_id" />
+                      <input type="hidden" id="customer_id" />
                       <input type="hidden" class="form-control" value="<?php echo $db->getMax('returns'); ?>" id="return_id" />
                     </div>
                   </div>
 
-  			        	<div class="form-group col-md-8">
-                    <div class="input-group date">
-                      <div class="input-group-addon">
-                        Address
-                      </div>
-                      <input type="text" class="form-control" readonly id="customer_address" value="" />
-                    </div>
-                  </div>
+
   			        	<div class="form-group col-md-4">
                     <div class="input-group date">
                       <div class="input-group-addon">
@@ -116,7 +96,7 @@
                             </select>
                         </td>
                         <td><input type="text" class="form-control quantity" value="0" placeholder=""></td>
-                        <td><input type="text" class="form-control amount" value="0.00" placeholder="" readonly></td>
+                        <td><input type="text" class="form-control amount" value="0.00" placeholder=""></td>
                         <td><input type="text" class="form-control total" value="0.00" placeholder="" readonly></td>
                       </tr>
                     <?php
@@ -199,7 +179,13 @@
     $('#discount').on("keyup",function(){
       $('#total_amount').val(computeTotal().toFixed(2));
     });
+    $('#sid').on("change",function(){
+      var sale_id = $('#sid').val().split(",")[0];
+      var customer_id = $('#sid').val().split(",")[1];
 
+      $('#sale_id').val(sale_id);
+      $('#customer_id').val(customer_id);
+    });
     $('.particulars').on("change",function(){
 
       var ind = ($(this)).index('.particulars');

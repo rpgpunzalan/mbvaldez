@@ -64,6 +64,13 @@
                       echo $db->ddlArea();
                     ?>
                   </select>
+                </div><div class="form-group">
+                  <label for="address">Pre Seller</label>
+                  <select class="form-control select2" id="preseller" style="width: 100%;">
+                    <?php
+                      echo $db->ddlPresellers();
+                    ?>
+                  </select>
                 </div>
 
 		                <div class="form-group">
@@ -99,7 +106,8 @@
         		'customer_name':$('#customer_name').val(),
         		'address':$('#address').val(),
         		'contact_no':$('#contact_no').val(),
-        		'area':$('#area').val()
+            'area':$('#area').val(),
+            'preseller':$('#preseller').val()
         },
         success: function(data){
           console.log(data)

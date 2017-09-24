@@ -36,6 +36,7 @@
             </div>
       <div class="row">
       	<div class="col-md-12">
+              <a href="inventoryReport.php"></i> Daily Report</a>
 	      	<div class="box box-success">
 		        <div class="box-header with-border">
               <a href="addItem.php"><i class="fa fa-plus"></i> Add New Item</a>

@@ -86,6 +86,13 @@
           </div>
 
           </div>
+          <?php
+            if(isset($_GET['d2'])){
+              print date_format(date_create($_GET['d2']),"F d, Y");
+            }else{
+              print date_format(date_create(date( 'Y-m-d', strtotime( 'today' ) )),"F d, Y");
+            }
+          ?>
           <div class="table-bordered">
             <table class="table" id="inventoryTable">
             <thead>

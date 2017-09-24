@@ -19,50 +19,6 @@
         Customers
       </h1>
     </section>
-
-    <div class="modal fade" id="editCustomer" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title" id="myModalLabel">Edit</h4>
-          </div>
-          <div class="modal-body">
-            <div class="form-group col-md-12">
-              <div class="input-group date">
-                <div class="input-group-addon">
-                  Customer Name
-                </div>
-                <input type="text" class="form-control pull-right" id="new_name" value="0">
-              </div>
-            </div>
-            <div class="form-group col-md-12">
-              <div class="input-group date">
-                <div class="input-group-addon">
-                  Address
-                </div>
-                <input type="text" class="form-control pull-right" id="new_address" value="0">
-              </div>
-            </div>
-            <div class="form-group col-md-12">
-              <div class="input-group date">
-                <div class="input-group-addon">
-                  Contact Number
-                </div>
-                <input type="text" class="form-control pull-right" id="new_contact" value="0">
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" data-target='#recordPayment' data-toggle="modal" onclick="editCustomer()">Edit</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Main content -->
     <section class="content">
       <div class="sk-folding-cube" id="loader">
@@ -82,25 +38,27 @@
 		          <table id="customerList" class="table table-bordered table-striped">
                 <thead>
                 <tr>
+                  <th>Customer ID</th>
                   <th>Customer Name</th>
                   <th>Address</th>
                   <th>Contact Number</th>
                   <th>Area</th>
                   <th>Receivables</th>
-                  <th>Action</th>
+                  <th>Deposits</th>
                 </tr>
                 </thead>
                 <tbody>
-
+                  <?php $db->getCustomerList(); ?>
                 </tbody>
                 <tfoot>
                 <tr>
+                  <th>Customer ID</th>
                   <th>Customer Name</th>
                   <th>Address</th>
                   <th>Contact Number</th>
                   <th>Area</th>
                   <th>Receivables</th>
-                  <th>Action</th>
+                  <th>Deposits</th>
                 </tr>
                 </tfoot>
               </table>
@@ -119,54 +77,31 @@
   $ui->externalScripts();
 ?>
 <script>
-var customer_id;
-
-function editCustomer(){
-  $.ajax({
-      url: '../gateway/adps.php?op=editCustomer',
-      type: 'post',
-      dataType: 'json',
-      data: {
-        'customer_id': customer_id,
-        'new_name': $('#new_name').val(),
-        'new_address': $('#new_address').val(),
-        'new_contact': $('#new_contact').val()
-      },
-      success: function(data){
-        location.reload();
-      }
-    });
-}
-
-$(document).on("click", ".showEditCustomer", function () {
-      customer_id = $(this).data('id');
-      document.getElementById("new_name").value = $(this).data('name');
-      document.getElementById("new_address").value = $(this).data('address');
-      document.getElementById("new_contact").value = $(this).data('contact');
-    });
-  $(function () {
-    $.ajax({
-      url: '../gateway/adps.php?op=getCustomerList',
-      type: 'get',
-      dataType: 'json',
-      success: function(data){
-        $('#loader').css("display","none");
-        $('#customerList tbody').html("");
-        for(var i=0;i<data.result.length;i++)
-        {
-          var customer = data.result[i];
-          $('#customerList tbody').html($('#customerList tbody').html()+
-                                            "<tr><td><a href=customerDetails.php?customer_id="+customer.customer_id+">"+customer.customer_name+"</a>"+
-                                            "</td><td>"+(customer.address==null || customer.address==""  ?"-":customer.address)+
-                                            "</td><td>"+(customer.contact_no==null || customer.contact_no==""  ?"-":customer.contact_no)+
-                                            "</td><td>"+(customer.area_name==null || customer.area_name==""  ?"-":customer.area_name)+
-                                            "</td><td>"+parseFloat(customer.receivables[0].receivables).toFixed(2)+
-                                            "</td><td><a href='#' class='btn btn-primary btn-block showEditCustomer' data-toggle='modal' data-target='#editCustomer' data-id='"+customer.customer_id+"' data-name='"+customer.customer_name+"' data-address='"+customer.address+"' data-contact='"+customer.contact_no+"'><b>Edit</b></a></tr>");
-        }
-      $('#customerList').dataTable();
-      }
-    });
-  });
+  // $(function () {
+  //   $.ajax({
+  //     url: '../gateway/adps.php?op=getCustomerList',
+  //     type: 'get',
+  //     dataType: 'json',
+  //     success: function(data){
+  //       $('#loader').css("display","none");
+  //       $('#customerList tbody').html("");
+  //       for(var i=0;i<data.result.length;i++)
+  //       {
+  //         var customer = data.result[i];
+  //         $('#customerList tbody').html($('#customerList tbody').html()+
+  //                                           "<tr><td><a href=customerDetails.php?customer_id="+customer.customer_id+">"+customer.customer_name+"</a>"+
+  //                                           "</td><td>"+(customer.address==null || customer.address==""  ?"-":customer.address)+
+  //                                           "</td><td>"+(customer.contact_no==null || customer.contact_no==""  ?"-":customer.contact_no)+
+  //                                           "</td><td>"+(customer.area_name==null || customer.area_name==""  ?"-":customer.area_name)+
+  //                                           "</td><td>"+parseFloat(customer.receivables[0].receivables).toFixed(2)+
+  //                                           "</td><td>"+parseFloat(customer.receivables[0].receivables).toFixed(2)+"</td></tr>");
+  //       }
+  //     $('#customerList').dataTable();
+  //     }
+  //   });
+  // });
+  $('#loader').css("display","none");
+  $('#customerList').dataTable();
 
   function _calculateAge(birthday) { // birthday is a date
       var ageDifMs = Date.now() - birthday.getTime();

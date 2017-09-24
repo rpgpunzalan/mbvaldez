@@ -4,6 +4,7 @@
   $db = new adps_functions();
 ?>
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,7 +21,7 @@
     </section>
     <!-- Main content -->
     <section class="content">
-      
+
       <div class="row">
       	<div class="col-md-12">
 	      	<div class="box box-success">
@@ -54,13 +55,13 @@
                       <input type="text" class="form-control" id="shipment_no" value="" />
                     </div>
                   </div>
-                  
+
                 </div>
-  		        	   
+
                   <div id="searchShipment"class="col-md-12">
                       <button class="btn btn-lg btn-primary col-md-12 col-sm-12 col-xs-12" onclick="searchShipment()">Search Shipment</button>
                   </div>
-                  
+
                 </div>
                 <div class="table-bordered">
                     <table class="table" id="shipmentTable">
@@ -169,7 +170,7 @@
                 var cell3 = row.insertCell(2);
                 var cell4 = row.insertCell(3);
                 var cell5 = row.insertCell(4);
-        
+
                 cell1.innerHTML = data.data[i].po_id;
                 cell2.innerHTML = "P " + data.data[i].total_amount;
                 total_invoice = total_invoice + parseInt(data.data[i].total_amount);
@@ -177,12 +178,12 @@
                 cell3.innerHTML = "P " + data.data[i].amount_paid;
                 cell4.innerHTML = "P " + data.data[i].discount;
                 cell5.innerHTML = data.data[i].po_date;
-         
+
                 po_id.push(parseInt(data.data[i].po_id));
                 total_amount.push(parseInt(data.data[i].total_amount));
                 amount_paid.push(parseInt(data.data[i].amount_paid));
 
-        
+
               }
 
               total_invoice = total_invoice - paid;
@@ -208,8 +209,8 @@
     var new_paid = [];
 
     var payment_amount = parseInt($('#payment_amount').val()) + parseInt($('#discount').val());
-    
-    balance =  total_invoice - parseInt($('#payment_amount').val()); 
+
+    balance =  total_invoice - parseInt($('#payment_amount').val());
 
     var original = payment_amount;
 
@@ -227,7 +228,7 @@
         dataType: 'json',
         success: function(data){
           if(data.status=="success"){
-            
+
             var today = new Date();
             var dd = today.getDate();
             var mm = today.getMonth()+1; //January is 0!
@@ -235,11 +236,11 @@
 
             if(dd<10) {
                 dd = '0'+dd
-            } 
+            }
 
             if(mm<10) {
                 mm = '0'+mm
-            } 
+            }
 
             today = yyyy + '-' + mm + '-' + dd;
 
@@ -317,11 +318,11 @@
 
             if(dd<10) {
                 dd = '0'+dd
-            } 
+            }
 
             if(mm<10) {
                 mm = '0'+mm
-            } 
+            }
 
             today = yyyy + '-' + mm + '-' + dd;
 
@@ -357,7 +358,7 @@
           }
         }
       });
-      
+
 
     }
 

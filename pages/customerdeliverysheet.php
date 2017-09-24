@@ -23,7 +23,7 @@
 <div class="wrapper">
 
   <?php
-    $ui->showHeader(7);
+    $ui->showHeader(4);
   ?>
   <section class="content-header">
     <h1>
@@ -87,20 +87,38 @@
 
           </div>
           <div class="table-bordered">
-            <table class="table" id="cds">
+            <table class="table" id="cds" style="line-height: 8px;">
               <thead>
                 <tr>
                   <th>Customer</th>
-                  <th>Date</th>
+                  <th>Pre=seller</th>
+                  <th>Area</th>
+                  <th>Sale ID</th>
                   <th>Quantity</th>
                   <th>Amount</th>
                   <th>Return Item</th>
                   <th>Return Amount</th>
+                  <th>Amount Paid</th>
+                  <th>Amount Unpaid</th>
                 </tr>
               </thead>
                 <?php
                   $db->cds($d1,$d2);
                 ?>
+              <tfoot>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th><span id="totalqty1"></span></th>
+                  <th><span id="totalamt"></span></th>
+                  <th><span id="totalret"></span></th>
+                  <th><span id="totalretamt"></span></th>
+                  <th><span id="totalamtpaid"></span></th>
+                  <th><span id="totalamtunpaid"></span></th>
+                </tr>
+              </tfoot>
             </table>
           </div>
           <button type="button" class="btn" onclick="exportAsPDF()">Export PDF</button>
@@ -116,7 +134,37 @@
   $ui->externalScripts();
 ?>
 <script>
+   $('#cds').dataTable({
+          "order": [[ 1, "asc" ]],
+          "footerCallback": function ( row, data, start, end, display ) {
+            var api = this.api();
+            var totalQty = 0;
+            var totalamt = 0;
+            var totalret = 0;
+            var totalretamt = 0;
+            var totalamtpaid = 0;
+            var totalamtunpaid = 0;
 
+            console.log(api.column(8,{page:'current'}).data())
+            for (var i = 0; i < api.column(3,{page:'current'}).data().length; i++) {
+
+              totalQty += parseInt((api.column(4,{page:'current'}).data()[i]).replace(",",""));
+              totalamt += parseFloat((api.column(5,{page:'current'}).data()[i]).replace(",",""));
+              totalret += parseInt((api.column(6,{page:'current'}).data()[i]).replace(",",""));
+              totalretamt += parseFloat((api.column(7,{page:'current'}).data()[i]).replace(",",""));
+              totalamtpaid += parseFloat((api.column(8,{page:'current'}).data()[i]).replace(",",""));
+              totalamtunpaid += parseFloat((api.column(9,{page:'current'}).data()[i]).replace(",",""));
+            }
+            console.log(totalamtunpaid)
+            $('#totalqty1').html(totalQty);
+            $('#totalamt').html(parseFloat(totalamt).toFixed(2));
+            $('#totalret').html(totalret);
+            $('#totalretamt').html(parseFloat(totalretamt).toFixed(2));
+            $('#totalamtpaid').html(parseFloat(totalamtpaid).toFixed(2));
+            $('#totalamtunpaid').html(parseFloat(totalamtunpaid).toFixed(2));
+           }
+
+      });
   var cdsRows = [];
   var newRow = [];
 

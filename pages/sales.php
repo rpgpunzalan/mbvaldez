@@ -1,4 +1,4 @@
-<?php
+  <?php
   session_start();
   include "../utils/functions.php";
   $ui = new ui_functions();
@@ -7,7 +7,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <?php $ui->showHeadHTML("Sales");?>
+  <?php $ui->showHeadHTML("Sales");
+
+  if(isset($_GET['d1']) && isset($_GET['d2'])){
+    $d1 = $_GET['d1'];
+    $d2 = $_GET['d2'];
+  }else {
+    $d1 = '2017-01-01';
+    $d2 = date( 'Y-m-d', strtotime( 'today' ) );
+  }
+
+  ?>
+
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
@@ -125,7 +136,22 @@
             <a href="addSale.php"><i class="fa fa-plus"></i> Add New Sale</a>
           </div>
           <div class="tab-content no-padding">
+             
+                <input type="hidden" value="<?php echo $d1; ?>" id="startDate" />
+                <input type="hidden" value="<?php echo $d2; ?>" id="endDate" />
+             
+              <div class="form-group">
+                  <label>Date range:</label>
 
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="dateRange">
+                  </div>
+                  <!-- /.input group -->
+                </div>
+              </div>
               <div class="box-body"style="overflow-x:auto;">
                 <table id="saleOrderTable" class="table table-bordered table-striped">
                   <thead>
@@ -139,10 +165,11 @@
                     <th>Due Date</th>
                     <th>Status</th>
                     <th>Action</th>
+                    <th></th>
                   </tr>
                   </thead>
                   <tbody>
-
+                  <?php $db->getSaleList(); ?>
                   </tbody>
                   <tfoot>
                   <tr>
@@ -155,6 +182,7 @@
                     <th>Due Date</th>
                     <th>Status</th>
                     <th>Action</th>
+                    <th></th>
                   </tr>
                   </tfoot>
                 </table>
@@ -174,12 +202,38 @@
   $ui->externalScripts();
 ?>
 <script>
+
+  function addPaymentFull(sale_id,total_amount,sale_date){
+    $.ajax({
+      url: '../gateway/adps.php?op=addPaymentSales',
+      type: 'post',
+      data:{
+        'user_id': 1,
+        'sale_id': sale_id,
+        'payment_method': 1,
+        'amount': total_amount,
+        'trans_date': sale_date,
+        'cc_id': -1
+      },
+      dataType: 'json',
+      success: function(data){
+        if(data.status=="success"){
+          window.location.replace("sales.php?recordPayment=1");
+        }else{
+          // window.location.replace("sales.php?recordPayment=0");
+        }
+      }
+    });
+  }
   function recordPayment(){
     $cc_id = -1;
-    if($('#payment_method').val()==3)
-      $cc_id = $('#cc_id').val();
-      $bank_id = $('#bank_id').val();
-      $check_date = $('#check_date').val();
+    $bank_id = 0;
+    $check_date = 0;
+    if($('#payment_method').val()==3){
+          $cc_id = $('#cc_id').val();
+          $bank_id = $('#bank_id').val();
+          $check_date = $('#check_date').val();
+        }
     $.ajax({
       url: '../gateway/adps.php?op=addPaymentSales',
       type: 'post',
@@ -191,7 +245,7 @@
         'trans_date': $('#sale_date').val(),
         'cc_id': $cc_id,
         'bank_id': $bank_id,
-        'check_date': $bank_id
+        'check_date': $check_date
       },
       dataType: 'json',
       success: function(data){
@@ -221,45 +275,63 @@
       $(".modal-body #modal_sale_id").html(sale_id );
     });
 
-    $.ajax({
-      url: '../gateway/adps.php?op=getSaleOrderList',
-      type: 'get',
-      dataType: 'json',
-      success: function(data){
-        $('#loader').css("display","none");
-        $('#saleOrderTable tbody').html("");
-        $.each(data.result, function(i,sale)
-        {
-          if((sale.total_amount-sale.amount_paid)>0)
-            $('#saleOrderTable tbody').html($('#saleOrderTable tbody').html()+
-                                            "<tr><td><a href=saleDetails.php?sale_id="+sale.sale_id+">"+sale.sale_id+"</a>"+
-                                            "</td><td>"+sale.sale_date+
-                                            "</td><td>"+sale.customer_name+
-                                            "</td><td>"+sale.area_name+
-                                            "</td><td>"+sale.total_amount+
-                                            "</td><td>"+(sale.total_amount-sale.amount_paid)+
-                                            "</td><td>"+sale.due_date+
-                                            "</td><td>"+sale.status_name+
-                                            "</td><td><a href='#' class='btn btn-primary btn-block showRecordPayment' data-toggle='modal' data-target='#recordPayment' data-id='"+sale.sale_id+"'><b>Record Collection</b></a></tr>");
+    // $.ajax({
+    //   url: '../gateway/adps.php?op=getSaleOrderList&d1='+$('#startDate').val()+'&d2='+$('#endDate').val(),
+    //   type: 'get',
+    //   dataType: 'json',
+    //   success: function(data){
+    //     console.log(data)
+        
+    //     $('#saleOrderTable tbody').html("");
+    //     $.each(data.result, function(i,sale)
+    //     {
+    //       if((sale.total_amount-sale.amount_paid)>0)
+    //         $('#saleOrderTable tbody').html($('#saleOrderTable tbody').html()+
+    //                                         "<tr><td><a href=saleDetails.php?sale_id="+sale.sale_id+">"+sale.sale_id+"</a>"+
+    //                                         "</td><td>"+sale.sale_date+
+    //                                         "</td><td>"+sale.customer_name+
+    //                                         "</td><td>"+sale.area_name+
+    //                                         "</td><td>"+sale.total_amount+
+    //                                         "</td><td>"+(sale.total_amount-sale.amount_paid)+
+    //                                         "</td><td>"+sale.due_date+
+    //                                         "</td><td>"+sale.status_name+
+    //                                         "</td><td><a href='#' class='btn btn-primary btn-block showRecordPayment' onclick='addPaymentFull("+sale.sale_id+","+sale.total_amount+","+sale.sale_date+");'><b>FULL</b></a>"+
+    //                                         "</td><td><a href='#' class='btn btn-primary btn-block showRecordPayment' data-toggle='modal' data-target='#recordPayment' data-id='"+sale.sale_id+"'><b>Record Collection</b></a></tr>");
 
-          else {
-            $('#saleOrderTable tbody').html($('#saleOrderTable tbody').html()+
-                                              "<tr><td><a href=saleDetails.php?sale_id="+sale.sale_id+">"+sale.sale_id+"</a>"+
-                                              "</td><td>"+sale.sale_date+
-                                              "</td><td>"+sale.customer_name+
-                                              "</td><td>"+sale.area_name+
-                                              "</td><td>"+sale.total_amount+
-                                              "</td><td>"+(sale.total_amount-sale.amount_paid)+
-                                              "</td><td>"+sale.due_date+
-                                              "</td><td>"+sale.status_name+
-                                              "</td><td>-</td></tr>");
-          }
-        });
-      $('#saleOrderTable').dataTable({
-          "order": [[ 1, "asc" ]]
+    //       else {
+    //         $('#saleOrderTable tbody').html($('#saleOrderTable tbody').html()+
+    //                                           "<tr><td><a href=saleDetails.php?sale_id="+sale.sale_id+">"+sale.sale_id+"</a>"+
+    //                                           "</td><td>"+sale.sale_date+
+    //                                           "</td><td>"+sale.customer_name+
+    //                                           "</td><td>"+sale.area_name+
+    //                                           "</td><td>"+sale.total_amount+
+    //                                           "</td><td>"+(sale.total_amount-sale.amount_paid)+
+    //                                           "</td><td>"+sale.due_date+
+    //                                           "</td><td>"+sale.status_name+
+    //                                           "</td><td>-</td></tr>");
+    //       }
+    //     });
+      
+    //   }
+    // });
+    $('#loader').css("display","none");
+    $('#saleOrderTable').dataTable();
+    if(typeof $('#startDate').val() != "undefined" && typeof $('#endDate').val()!="undefined"){
+
+      $('#dateRange').daterangepicker({format: 'MM/DD/YYYY',startDate: new Date($('#startDate').val()),endDate: new Date($('#endDate').val())},
+      function(start, end) {
+         startDate = start.format('YYYY-MM-DD');
+         endDate = end.format('YYYY-MM-DD');
+         window.location.replace("sales.php?d1="+startDate+"&d2="+endDate);
       });
-      }
-    });
+    }else {
+      $('#dateRange').daterangepicker({format: 'MM/DD/YYYY'},
+      function(start, end) {
+         startDate = start.format('YYYY-MM-DD');
+         endDate = end.format('YYYY-MM-DD');
+         window.location.replace("sales.php?d1="+startDate+"&d2="+endDate);
+      });
+    }
   });
 </script>
 </body>

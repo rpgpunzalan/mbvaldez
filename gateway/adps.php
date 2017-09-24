@@ -1,7 +1,7 @@
 <?php
 	session_start();
 	include '../utils/functions.php';
-	
+
 	$db = new adps_functions();
 	// $db->sec_session_start(); // Our custom secure way of starting a PHP session.
   if(isset($_GET['op'])){
@@ -28,7 +28,7 @@
       case "addCustomer":{
         if(isset($_SESSION['user_id'])&&isset($_POST['customer_name'])&&isset($_POST['address'])&&isset($_POST['contact_no'])&&isset($_POST['area'])){
           $record_id = $db->addRecord($_SESSION['user_id']);
-          $customer_id = $db->addCustomer($_POST['customer_name'],$_POST['address'],$_POST['contact_no'],$_POST['area'],$record_id);
+          $customer_id = $db->addCustomer($_POST['customer_name'],$_POST['address'],$_POST['contact_no'],$_POST['area'],$record_id,$_POST['preseller']);
           if(is_numeric($customer_id)) echo json_encode(array("status"=>"success", "user_id"=>$customer_id));
           else echo json_encode(array("status"=>"failed", "message"=>$customer_id));
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
@@ -85,6 +85,12 @@
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;
       }
+      case "getItems": {
+		$res = $db->getItemList();
+		$supplierDetails = $db->getItemList();
+		echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res));
+        break;
+      }
 			case "addExpense": {
 				if(isset($_POST['expense_id'])&&isset($_POST['expense_date'])&&isset($_POST['payee'])&&isset($_POST['total_amount'])){
 					$record_id = $db->addRecord($_SESSION['user_id']);
@@ -101,6 +107,42 @@
 				}else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
 				break;
 			}
+			case "addCashVoucher":{
+
+        if(isset($_POST['voucher_id'])&&isset($_POST['voucher_date'])&&isset($_POST['payee'])&&isset($_POST['itemList'])&&isset($_POST['total_amount'])){
+          $record_id = $db->addRecord($_SESSION['user_id']);
+					$date = date_create($_POST['voucher_date']);
+					// $due_date = date_add($date,date_interval_create_from_date_string("2 days"));
+          $sale_id = $db->addCashVoucher($_POST['voucher_id'],date_create($_POST['voucher_date']),$_POST['payee'],$_POST['total_amount']);
+          if(is_numeric($sale_id)){
+						$itemList = $_POST['itemList'];
+						for($i=0;$i<count($itemList);$i++){
+							$item_id = $db->addCashVoucherItem($_POST['voucher_id'],$itemList[$i][0],$itemList[$i][1]);
+						}
+						echo json_encode(array("status"=>"success","voucher_id"=>$sale_id));
+					}
+          else echo json_encode(array("status"=>"failed", "message"=>$sale_id));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+			case "addCheckVoucher":{
+
+        if(isset($_POST['voucher_id'])&&isset($_POST['voucher_date'])&&isset($_POST['payee'])&&isset($_POST['itemList'])&&isset($_POST['total_amount'])){
+          $record_id = $db->addRecord($_SESSION['user_id']);
+					$date = date_create($_POST['voucher_date']);
+					// $due_date = date_add($date,date_interval_create_from_date_string("2 days"));
+          $sale_id = $db->addCheckVoucher($_POST['voucher_id'],date_create($_POST['voucher_date']),$_POST['payee'],$_POST['check_no'],$_POST['total_amount']);
+          if(is_numeric($sale_id)){
+						$itemList = $_POST['itemList'];
+						for($i=0;$i<count($itemList);$i++){
+							$item_id = $db->addCheckVoucherItem($_POST['voucher_id'],$itemList[$i][0],$itemList[$i][1]);
+						}
+						echo json_encode(array("status"=>"success","voucher_id"=>$sale_id));
+					}
+          else echo json_encode(array("status"=>"failed", "message"=>$sale_id));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
 			case "addSale":{
 
         if(isset($_POST['sale_id'])&&isset($_POST['sale_date'])&&isset($_POST['total_amount'])&&isset($_POST['itemList'])&&isset($_POST['discount'])){
@@ -112,13 +154,15 @@
 						{
 							$expense_id = $db->addExpense(date_create($_POST['sale_date']),$customer['customer_name'],$customer['address'],1,$_POST['discount'],1,$_POST['discount'],date_create($_POST['sale_date']),-1,$record_id);
 							$db->addExpenseItem($expense_id,"Discount for Sale Number ".$_POST['sale_id'],$_POST['discount']);
+
 						}
-          $sale_id = $db->addSale($_POST['sale_id'],$_POST['customer_id'],date_create($_POST['sale_date']),$_POST['total_amount'],$record_id,$_POST['discount']);
+          $sale_id = $db->addSale($_POST['customer_id'],date_create($_POST['sale_date']),$_POST['total_amount'],$record_id,$_POST['discount']);
           if(is_numeric($sale_id)){
 						$itemList = $_POST['itemList'];
 						for($i=0;$i<count($itemList);$i++){
-							$item_id = $db->addSaleItem($_POST['sale_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
+							$item_id = $db->addSaleItem($sale_id,$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 							$db->addInventory($itemList[$i][0],($itemList[$i][1]*-1),$itemList[$i][2],date_create($_POST['sale_date']),$record_id);
+							$db->addReturnEmpty($item_id,$_POST['customer_id'],0,$itemList[$i][1]*1,date_create($_POST['sale_date']));
 						}
 						echo json_encode(array("status"=>"success","sale_id"=>$sale_id));
 					}
@@ -152,9 +196,44 @@
 
 			$itemList = $_POST['itemList'];
 			for($i=0;$i<count($itemList);$i++){
-				$return_id = $db->addReturnEmpty($_POST['return_id'],$itemList[$i][0],$_POST['customer_id'],$itemList[$i][1],$itemList[$i][2],$_POST['return_date']);
+				$return_id = $db->addReturnEmpty($_POST['return_id'],$itemList[$i][0],$_POST['customer_id'],$itemList[$i][1],$itemList[$i][2],date_create($_POST['return_date']));
 				$empty_id = $db->addInventoryEmpty($_POST['return_id'],$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 			}
+			echo json_encode(array("status"=>"success"));
+
+          //else echo json_encode(array("status"=>"failed", "message"=>$return_id));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+      case "addCustomerDeposit":{ /**SEPT4**/
+
+        if(isset($_POST['return_date'])&&isset($_POST['itemList'])){
+
+			$itemList = $_POST['itemList'];
+			$deposit_amount = 0;
+			for($i=0;$i<count($itemList);$i++){
+				$deposit_amount += ($itemList[$i][3]*$itemList[$i][1])+($itemList[$i][4]*$itemList[$i][2]);
+				$empty_id = $db->addReturnEmpty($itemList[$i][0],$_POST['customer_id'],($itemList[$i][1]*-1),($itemList[$i][2]*-1),date_create($_POST['return_date']));
+			}
+			$return_id = $db->addCustomerDeposit($_POST['customer_id'],$_POST['return_date'],$deposit_amount);
+			echo json_encode(array("status"=>"success"));
+
+          //else echo json_encode(array("status"=>"failed", "message"=>$return_id));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+      case "addMBDeposit":{ /**SEPT4**/
+
+        if(isset($_POST['return_date'])&&isset($_POST['itemList'])){
+
+			$itemList = $_POST['itemList'];
+			$deposit_amount = 0;
+			for($i=0;$i<count($itemList);$i++){
+				$deposit_amount += ($itemList[$i][3]*$itemList[$i][1])+($itemList[$i][4]*$itemList[$i][2]);
+				$empty_id = $db->addReturnEmpty($itemList[$i][0],$_POST['customer_id'],($itemList[$i][1]),($itemList[$i][2]),date_create($_POST['return_date']));
+			}
+			$return_id = $db->addMBDeposit($_POST['customer_id'],$_POST['return_date'],$deposit_amount);
 			echo json_encode(array("status"=>"success"));
 
           //else echo json_encode(array("status"=>"failed", "message"=>$return_id));
@@ -183,7 +262,7 @@
       case "updateBalance":{
 
         if(isset($_POST['shipment_no'])){
-        	
+
         	$po_id = $_POST['po_id'];
         	$new_paid = $_POST['new_paid'];
 
@@ -195,6 +274,7 @@
         break;
       }
 
+
       case "addPurchaseOrder":{
 
         if(isset($_POST['po_id'])&&isset($_POST['po_date'])&&isset($_POST['total_amount'])&&isset($_POST['itemList'])&&isset($_POST['discount'])){
@@ -204,12 +284,13 @@
           $po_id = $db->addPurchaseOrder($_POST['po_id'],$_POST['supplier_id'],date_create($_POST['po_date']),$_POST['total_amount'],$due_date,1,$record_id,$_POST['discount'],$_POST['shipment_no']);
           if(is_numeric($po_id)){
 
-          				$db->removeEmpty($_POST['supplier_id']);
-			
+
+
 						$itemList = $_POST['itemList'];
 						for($i=0;$i<count($itemList);$i++){
 							$item_id = $db->addPOItem($po_id,$itemList[$i][0],$itemList[$i][1],$itemList[$i][2]);
 							$db->addInventory($itemList[$i][0],$itemList[$i][1],$itemList[$i][2],date_create($_POST['po_date']),$record_id);
+							$db->addReturnEmpty($itemList[$i][0],$_POST['supplier_id'],0,($itemList[$i][1]*-1),date_create($_POST['po_date']));
 						}
 						echo json_encode(array("status"=>"success","po_id"=>$po_id));
 					}
@@ -217,41 +298,29 @@
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;
       }
-
-      case "editPurchaseOrder":{
-
-        if(isset($_POST['po_id'])){
-          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
-
-          $msg = $db->editPO($_POST['po_id'],$_POST['new_amount'],$_POST['new_quantity'],$_POST['item_id']);
-          echo json_encode(array("status"=>$msg));
+			case "getCashVoucherById": {
+				if(isset($_GET['voucher_id'])){
+						$items = $db->getCashVoucherItems($_GET['voucher_id']);
+						$res = $db->getCashVoucherById($_GET['voucher_id']);
+						echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res,"items"=>$items));
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;
-      }
-
-      case "editSupplier":{
-
-        if(isset($_POST['supplier_id'])){
-          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
-
-          $msg = $db->editSupplier($_POST['supplier_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact']);
-          echo json_encode(array("status"=>$msg));
+			}
+		case "prepareDelivery": {
+			if(isset($_GET['d1'])){
+					$res = $db->prepareDelivery($_GET['d1'],$_GET['preseller']);
+					echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res));
+        	}else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        	break;
+		}
+			case "getCheckVoucherById": {
+				if(isset($_GET['voucher_id'])){
+						$items = $db->getCheckVoucherItems($_GET['voucher_id']);
+						$res = $db->getCheckVoucherById($_GET['voucher_id']);
+						echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res,"items"=>$items));
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;
-      }
-
-      case "editCustomer":{
-
-        if(isset($_POST['customer_id'])){
-          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
-
-          $msg = $db->editCustomer($_POST['customer_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact']);
-          echo json_encode(array("status"=>$msg));
-        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
-        break;
-      }
-
-
+			}
 			case "getPurchaseOrderById": {
 				if(isset($_GET['po_id'])){
 						$items = $db->getPOItems($_GET['po_id']);
@@ -296,10 +365,34 @@
 				echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res));
         break;
 			}
-			case "getSaleOrderList": {
+			case "getCashVoucherList": {
 				if(isset($_POST['d1'])&&isset($_POST['d2'])){
 					if($_POST['d1']==""&&$_POST['d2']==""){
-						$res = $db->getPurchaseOrderListRange($_POST['d1'],$_POST['d2']);
+						$res = $db->getCashVoucherListRange($_POST['d1'],$_POST['d2']);
+					}else {
+						$res = $db->getCashVoucherList();
+					}
+
+        }else $res = $db->getCashVoucherList();
+				echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res));
+        break;
+			}
+			case "getCheckVoucherList": {
+				if(isset($_POST['d1'])&&isset($_POST['d2'])){
+					if($_POST['d1']==""&&$_POST['d2']==""){
+						$res = $db->getCheckVoucherListRange($_POST['d1'],$_POST['d2']);
+					}else {
+						$res = $db->getCheckVoucherList();
+					}
+
+        }else $res = $db->getCheckVoucherList();
+				echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res));
+        break;
+			}
+			case "getSaleOrderList": {
+				if(isset($_GET['d1'])&&isset($_GET['d2'])){
+					if($_GET['d1']!=""&&$_GET['d2']!=""){
+						$res = $db->getSaleListRange($_GET['d1'],$_GET['d2']);
 					}else {
 						$res = $db->getSaleList();
 					}
@@ -311,7 +404,7 @@
 			case "getExpenseList": {
 				if(isset($_POST['d1'])&&isset($_POST['d2'])){
 					if($_POST['d1']==""&&$_POST['d2']==""){
-						$res = $db->getPurchaseOrderListRange($_POST['d1'],$_POST['d2']);
+						$res = $db->getExpenseListRange($_POST['d1'],$_POST['d2']);
 					}else {
 						$res = $db->getExpenseList();
 					}

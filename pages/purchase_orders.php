@@ -117,6 +117,7 @@
                     <th>Invoice Number</th>
                     <th>Supplier</th>
                     <th>Date</th>
+                    <th>Total Qty</th>
                     <th>Total Amount</th>
                     <th>Balance</th>
                     <th>Due Date</th>
@@ -128,17 +129,15 @@
 
                   </tbody>
                   <tfoot>
-                  <tr>
-                    <th>Shipment Number</th>
-                    <th>Invoice Number</th>
-                    <th>Supplier</th>
-                    <th>Date</th>
-                    <th>Total Amount</th>
-                    <th>Balance</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
+                    <tr>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th><span id="totalqty1"></span></th>
+                      <th><span id="totalamt"></span></th>
+                      <th><span id="totalbal"></span></th>
+                    </tr>
                   </tfoot>
                 </table>
               </div>
@@ -210,6 +209,7 @@
                                             "<td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
                                             "</td><td>"+po.supplier_name+
                                             "</td><td>"+po.po_date+
+                                            "</td><td>"+po.total_qty+
                                             "</td><td>"+po.total_amount+
                                             "</td><td>"+(po.total_amount-po.amount_paid).toFixed(2)+
                                             "</td><td>"+po.due_date+
@@ -222,6 +222,7 @@
                                               "<td><a href=purchaseOrderDetails.php?po_id="+po.po_id+">"+po.po_id+"</a>"+
                                               "</td><td>"+po.supplier_name+
                                               "</td><td>"+po.po_date+
+                                              "</td><td>"+po.total_qty+
                                               "</td><td>"+po.total_amount+
                                               "</td><td>"+(po.total_amount-po.amount_paid).toFixed(2)+
                                               "</td><td>"+po.due_date+
@@ -231,7 +232,23 @@
         });
       $('#purchaseOrderTable').dataTable({
         buttons: [ 'excel' ],
-        order: [[ 1, "asc" ]]
+        order: [[ 1, "asc" ]],
+        footerCallback: function ( row, data, start, end, display ) {
+            var api = this.api();
+            var totalQty = 0;
+            var totalamt = 0;
+            var totalbal = 0;
+
+            for (var i = 0; i < api.column(4,{page:'current'}).data().length; i++) {
+
+              totalQty += parseInt((api.column(4,{page:'current'}).data()[i]).replace(",",""));
+              totalamt += parseFloat((api.column(5,{page:'current'}).data()[i]).replace(",",""));
+              totalbal += parseFloat((api.column(6,{page:'current'}).data()[i]).replace(",",""));
+            }
+            $('#totalqty1').html(totalQty);
+            $('#totalamt').html(parseFloat(totalamt).toFixed(2));
+            $('#totalbal').html(parseFloat(totalbal).toFixed(2));
+           }  
     });
       }
     });

@@ -34,7 +34,7 @@ session_start();
       <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <h4><i class="icon fa fa-check"></i> Success!</h4>
-        Successfully added a new Sale.
+        Successfully added a new Sale (SALE # <?php print $_GET['sale_id'];?>).
       </div>
       <?php }else{?>
       <div class="alert alert-danger alert-dismissible">
@@ -74,7 +74,7 @@ session_start();
                       <div class="input-group-addon">
                         Sale Number
                       </div>
-                      <input type="text" class="form-control" id="sale_id" readonly value="<?php echo $db->getMax('sales')+1; ?>" />
+                      <input type="text" class="form-control" id="sale_id" readonly value="<?php echo $db->getMax('sales'); ?>" />
                     </div>
                   </div>
 
@@ -98,15 +98,18 @@ session_start();
                 <div class="col-md-12">
                   <table class="table">
                     <thead>
+                      <th width="1%"></th>
                       <th width="50%">Particulars</th>
                       <th width="10%">Quantity</th>
-                      <th width="20%">Amount</th>
+                      <th width="15%">Amount</th>
+                      <th width="10%">Promo</th>
                       <th width="20%">Total</th>
                     </thead>
                     <?php
-                    for($i=0;$i<10;$i++){
+                    for($i=0;$i<50;$i++){
                     ?>
                       <tr>
+                        <td><span onclick="refreshParticulars(<?php echo $i ?>);"><i class="fa fa-refresh" /></span></td>
                         <td><select class="form-control select2 particulars" style="width: 100%;">
                               <option selected="selected" value="-1">Select Item</option>
                               <?php
@@ -115,8 +118,9 @@ session_start();
                             </select>
                         </td>
                         <td><input type="text" class="form-control quantity" value="0" placeholder=""></td>
-                        <td><input type="text" class="form-control amount" value="0.00" placeholder=""></td>
-                        <td><input type="text" class="form-control total" value="0.00" placeholder=""></td>
+                        <td><input type="text" class="form-control amount" value="0.00" placeholder="" readonly></td>
+                        <td><input type="text" class="form-control promo" value="0.00" placeholder=""></td>
+                        <td><input type="text" class="form-control total" value="0.00" placeholder="" readonly></td>
                       </tr>
                     <?php
                     }
@@ -162,7 +166,22 @@ session_start();
 ?>
 
 <script>
-
+  function refreshParticulars(xx){
+    $($('.particulars')[xx]).empty();
+   $.ajax({
+        url: '../gateway/adps.php?op=getItems',
+        type: 'post',
+        dataType: 'json',
+        success: function(data){
+          console.log(data);
+              $($('.particulars')[xx]).append("<option selected=\"selected\" value=\"-1\">Select Item</option>");
+           $.each(data.result, function(i,item)
+            {
+              $($('.particulars')[xx]).append("<option value='"+item.item_id+"'>"+item.item_description+"</option>");
+            });
+        }
+      });
+  }
   function computeTotal(){
     var tot = 0;
     for(let i=0;i<$('.total').length;i++){
@@ -205,14 +224,23 @@ session_start();
     $('.quantity').on("keyup",function(){
       var ind = ($(this)).index('.quantity');
       if($('.amount')[ind].value != ""){
-        $('.total')[ind].value = ($('.quantity')[ind].value*$('.amount')[ind].value).toFixed(2);
+        $('.total')[ind].value = ($('.quantity')[ind].value*($('.amount')[ind].value)-($('.promo')[ind].value*$('.quantity')[ind].value)).toFixed(2);
+      }
+      $('#total_amount').val(computeTotal()-$('#discount').val());
+    });
+    $('.promo').on("keyup",function(){
+      var ind = ($(this)).index('.promo');
+      if($('.promo')[ind].value != ""){
+        $('.total')[ind].value = ($('.quantity')[ind].value*($('.amount')[ind].value)-($('.promo')[ind].value*$('.quantity')[ind].value)).toFixed(2);
+      }else{
+        $('.total')[ind].value = ($('.quantity')[ind].value*($('.amount')[ind].value)-($('.promo')[ind].value*$('.quantity')[ind].value)).toFixed(2);
       }
       $('#total_amount').val(computeTotal()-$('#discount').val());
     });
     $('.amount').on("keyup",function(){
       var ind = ($(this)).index('.amount');
       if($('.quantity')[ind].value != ""){
-        $('.total')[ind].value = ($('.quantity')[ind].value*$('.amount')[ind].value).toFixed(2);
+        $('.total')[ind].value = ($('.quantity')[ind].value*($('.amount')[ind].value)-($('.promo')[ind].value*$('.quantity')[ind].value)).toFixed(2);
       }
       $('#total_amount').val(computeTotal()-$('#discount').val());
     });
@@ -226,11 +254,13 @@ session_start();
       //ind = (((ind+1)/2)-1);
       if($('.particulars').val()=="-99"){
         $('.amount')[ind].value = "0.00";
+        $('.promo')[ind].value = "0.00";
         $('.quantity')[ind].value = "0";
         $('.total')[ind].value = "0.00";
         $('#total_amount').value = "0.00";
       }else if($('.particulars').val()=="-1"){
         $('.amount')[ind].value = "0.00";
+        $('.promo')[ind].value = "0.00";
         $('.quantity')[ind].value = "0";
         $('.total')[ind].value = "0.00";
         $('#total_amount').value = "0.00";
@@ -249,7 +279,7 @@ session_start();
                 $('.total')[ind].value = item.display_srp;
               });
               if($('.amount')[ind].value != ""){
-                $('.total')[ind].value = ($('.quantity')[ind].value*$('.amount')[ind].value).toFixed(2);
+                $('.total')[ind].value = ($('.quantity')[ind].value*($('.amount')[ind].value)-($('.promo')[ind].value*$('.quantity')[ind].value)).toFixed(2);
               }
               $('#total_amount').val(computeTotal()-$('#discount').val());
             }
@@ -290,9 +320,9 @@ session_start();
   function addSale(){
     $('#loader').css("display","block");
     var itemList = [];
-    for(let i=0;i<10;i++){
+    for(let i=0;i<50;i++){
       if($('.particulars')[i].value != "-1")
-        itemList.push([$('.particulars')[i].value,$('.quantity')[i].value,$('.amount')[i].value]);
+        itemList.push([$('.particulars')[i].value,$('.quantity')[i].value,($('.amount')[i].value-($('.promo')[i].value))]);
     }
 		$.ajax({
         url: '../gateway/adps.php?op=addSale',
@@ -309,7 +339,7 @@ session_start();
         success: function(data){
           console.log(data);
           if(data.status == "success"){
-            window.location.replace("addSale.php?addSaleOrder=1");
+            window.location.replace("addSale.php?addSaleOrder=1&sale_id="+data.sale_id);
           }else{
             window.location.replace("addSale.php?addSaleOrder=0");
           }

@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <?php $ui->showHeadHTML("Return Empty"); ?>
+  <?php $ui->showHeadHTML("Record Customer Deposit"); ?>
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
@@ -16,7 +16,7 @@
   <?php $ui->showHeader(9); ?>
     <section class="content-header">
       <h1>
-        Return Empty
+        Customer Deposit
       </h1>
     </section>
     <!-- Main content -->
@@ -41,7 +41,7 @@
         <div class="col-md-12">
           <div class="box box-success">
             <div class="box-header with-border">
-              <h3 class="box-title">Return Details</h3>
+              <h3 class="box-title">Deposit Details</h3>
             </div>
             <div class="box-body">
               <div class="col-md-12">
@@ -92,9 +92,11 @@
                 <div class="col-md-12">
                   <table class="table">
                     <thead>
-                      <th width="50%">Particulars</th>
+                      <th width="30%">Particulars</th>
                       <th width="25%"># of Bottle</th>
+                      <th width="10%">Price per bottle</th>
                       <th width="25%"># of Case</th>
+                      <th width="10%">Price per case</th>
                     </thead>
                     <?php
                     for($i=0;$i<10;$i++){
@@ -108,7 +110,9 @@
                             </select>
                         </td>
                         <td><input type="text" id="num_bottle" class="form-control num_bottle" value="0" placeholder=""></td>
+                        <td><input type="text" id="price_bottle" class="form-control price_bottle" value="0" /></td>
                         <td><input type="text" id="num_case" class="form-control num_case" value="0" placeholder=""></td>
+                        <td><input type="text" id="price_case" class="form-control price_case" value="0" /></td>
                       </tr>
                     <?php
                     }
@@ -257,7 +261,7 @@
 
     for(let i=0;i<10;i++){
       if($('.particulars')[i].value != "-1")
-        itemList.push([$('.particulars')[i].value,$('.num_bottle')[i].value,$('.num_case')[i].value]);
+        itemList.push([$('.particulars')[i].value,$('.num_bottle')[i].value,$('.num_case')[i].value,$('.price_bottle')[i].value,$('.price_case')[i].value]);
     }
 
     /*console.log($('#return_id').val());
@@ -266,7 +270,7 @@
     console.log(itemList);*/
 
     $.ajax({
-        url: '../gateway/adps.php?op=addReturnEmpty',
+        url: '../gateway/adps.php?op=addCustomerDeposit',
         type: 'post',
         data: {'user_id':1,
             'return_date':$('#return_date').val(),
@@ -274,7 +278,7 @@
             'itemList':itemList
         },
         success: function(data){
-          window.location.replace("returnempties.php?addReturnEmpty=1");
+          window.location.replace("returnempties.php?addCustomerDeposit=1");
         }
       });
 
