@@ -383,6 +383,7 @@
           /*$record_id = $db->addRecord($_SESSION['user_id']);*/
 
           $msg = $db->editPO($_POST['po_id'],$_POST['new_amount'],$_POST['new_quantity'],$_POST['item_id']);
+          $msg = $db->editPO2($_POST['po_id']);
           echo json_encode(array("status"=>$msg));
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;

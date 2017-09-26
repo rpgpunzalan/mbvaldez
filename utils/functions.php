@@ -624,6 +624,25 @@ class adps_functions{
 
   }
 
+  public function editPO2($po_id){
+    $link = $this->connect();
+
+    $query=sprintf("UPDATE purchase_orders po
+                    INNER JOIN (
+                      SELECT po_id, SUM(quantity * cost) as total
+                      FROM purchase_order_items
+                      GROUP BY po_id
+                    ) poi ON po.po_id = '".mysqli_real_escape_string($link,$po_id)."' AND poi.po_id = '".mysqli_real_escape_string($link,$po_id)."'
+                    SET po.total_amount = poi.total - po.discount");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
   public function editCustomer($supplier_id,$new_name,$new_address,$new_contact){
     $link = $this->connect();
     $query=sprintf("UPDATE customers
