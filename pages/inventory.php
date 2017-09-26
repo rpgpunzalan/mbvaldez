@@ -18,6 +18,41 @@
 </head>
 <body class="hold-transition skin-blue sidebar-mini fixed">
 
+<div class="modal fade" id="editInventory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Edit</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Item Description
+                </div>
+                <input type="text" class="form-control pull-right" id="new_description" value="0">
+              </div>
+            </div>
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  SRP
+                </div>
+                <input type="text" class="form-control pull-right" id="new_srp" value="0">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-target='#recordPayment' data-toggle="modal" onclick="editInventory()">Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 <div class="wrapper">
 
   <?php $ui->showHeader(2); ?>
@@ -49,7 +84,7 @@
                   <th>Particulars</th>
                   <th>SRP</th>
                   <th>Supplier</th>
-                  <th>Quantity</th>
+                  <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -60,7 +95,7 @@
                   <th>Particulars</th>
                   <th>SRP</th>
                   <th>Supplier</th>
-                  <th>Quantity</th>
+                  <th>Action</th>
                 </tr>
                 </tfoot>
               </table>
@@ -120,6 +155,31 @@
   $ui->externalScripts();
 ?>
 <script>
+
+var item_id;
+
+  function editInventory(){
+  $.ajax({
+      url: '../gateway/adps.php?op=editInventory',
+      type: 'post',
+      dataType: 'json',
+      data: {
+        'item_id': item_id,
+        'new_description': $('#new_description').val(),
+        'new_srp': $('#new_srp').val()
+      },
+      success: function(data){
+        location.reload();
+      }
+    });
+}
+
+$(document).on("click", ".showEditInventory", function () {
+      item_id = $(this).data('id');
+      document.getElementById("new_description").value = $(this).data('description');
+      document.getElementById("new_srp").value = $(this).data('srp');
+    });
+
   $(function () {
     $.ajax({
       url: '../gateway/adps.php?op=getInventory',
@@ -143,7 +203,7 @@
                                             "<tr><td>"+item.item_description+
                                             "</td><td>"+item.display_srp+
                                             "</td><td><a href=supplierDetails.php?supplier_id="+item.supplier_id+">"+item.supplier_name+"</a>"+
-                                            "</td><td>"+qty+"</td></tr>");
+                                           "</td><td><a href='#' class='btn btn-primary btn-block showEditInventory' data-toggle='modal' data-target='#editInventory' data-id='"+item.item_id+"' data-description='"+item.item_description+"' data-srp='"+item.display_srp+"'><b>Edit</b></a></tr>");
         });
       $('#inventoryTable').dataTable();
       }

@@ -59,14 +59,7 @@
         break;
       }
       case "getInventory": {
-				if(isset($_POST['d1'])&&isset($_POST['d2'])){
-					if($_POST['d1']==""&&$_POST['d2']==""){
-						$res = $db->getInventoryRange($_POST['d1'],$_POST['d2']);
-					}else {
-						$res = $db->getInventory();
-					}
-
-        }else $res = $db->getInventory();
+				$res = $db->getInventory();
 				echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res));
         break;
       }
@@ -321,6 +314,81 @@
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;
 			}
+      case "editCustomer":{
+
+        if(isset($_POST['customer_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editCustomer($_POST['customer_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+      case "editInventory":{
+
+        if(isset($_POST['item_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editInventory2($_POST['item_id'],$_POST['new_description'],$_POST['new_srp']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+      case "editExpenses":{
+
+        if(isset($_POST['expense_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editExpenses($_POST['expense_id'],$_POST['new_date'],$_POST['new_payee'],$_POST['new_amount']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+      case "editReturnItems":{
+
+        if(isset($_POST['return_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editReturnItems($_POST['return_id'],$_POST['item_id'],$_POST['new_quantity'],$_POST['new_cost']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+      case "editReturns":{
+
+        if(isset($_POST['return_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editReturns($_POST['return_id'],$_POST['new_date']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+      case "editSupplier":{
+
+        if(isset($_POST['supplier_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editSupplier($_POST['supplier_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+      case "editPurchaseOrder":{
+
+        if(isset($_POST['po_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editPO($_POST['po_id'],$_POST['new_amount'],$_POST['new_quantity'],$_POST['item_id']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+
 			case "getPurchaseOrderById": {
 				if(isset($_GET['po_id'])){
 						$items = $db->getPOItems($_GET['po_id']);

@@ -19,6 +19,50 @@
         Customers
       </h1>
     </section>
+
+    <div class="modal fade" id="editCustomer" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Edit</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Customer Name
+                </div>
+                <input type="text" class="form-control pull-right" id="new_name" value="0">
+              </div>
+            </div>
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Address
+                </div>
+                <input type="text" class="form-control pull-right" id="new_address" value="0">
+              </div>
+            </div>
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Contact Number
+                </div>
+                <input type="text" class="form-control pull-right" id="new_contact" value="0">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-target='#recordPayment' data-toggle="modal" onclick="editCustomer()">Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Main content -->
     <section class="content">
       <div class="sk-folding-cube" id="loader">
@@ -45,6 +89,7 @@
                   <th>Area</th>
                   <th>Receivables</th>
                   <th>Deposits</th>
+                  <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -59,6 +104,7 @@
                   <th>Area</th>
                   <th>Receivables</th>
                   <th>Deposits</th>
+                  <th>Action</th>
                 </tr>
                 </tfoot>
               </table>
@@ -77,6 +123,32 @@
   $ui->externalScripts();
 ?>
 <script>
+
+var customer_id;
+
+  function editCustomer(){
+  $.ajax({
+      url: '../gateway/adps.php?op=editCustomer',
+      type: 'post',
+      dataType: 'json',
+      data: {
+        'customer_id': customer_id,
+        'new_name': $('#new_name').val(),
+        'new_address': $('#new_address').val(),
+        'new_contact': $('#new_contact').val()
+      },
+      success: function(data){
+        location.reload();
+      }
+    });
+}
+
+$(document).on("click", ".showEditCustomer", function () {
+      customer_id = $(this).data('id');
+      document.getElementById("new_name").value = $(this).data('name');
+      document.getElementById("new_address").value = $(this).data('address');
+      document.getElementById("new_contact").value = $(this).data('contact');
+    });
   // $(function () {
   //   $.ajax({
   //     url: '../gateway/adps.php?op=getCustomerList',

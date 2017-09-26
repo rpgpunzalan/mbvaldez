@@ -609,6 +609,119 @@ class adps_functions{
 
   }
 
+  public function editPO($po_id,$new_amount,$new_quantity,$item_id){
+    $link = $this->connect();
+    $query=sprintf("UPDATE purchase_order_items
+                    SET quantity = '".mysqli_real_escape_string($link,$new_quantity)."',
+                    cost = '".mysqli_real_escape_string($link,$new_amount)."'
+                    WHERE po_id = '".mysqli_real_escape_string($link,$po_id)."' AND item_id = '".mysqli_real_escape_string($link,$item_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editCustomer($supplier_id,$new_name,$new_address,$new_contact){
+    $link = $this->connect();
+    $query=sprintf("UPDATE customers
+                    SET customer_name = '".mysqli_real_escape_string($link,$new_name)."',
+                    address = '".mysqli_real_escape_string($link,$new_address)."',
+                    contact_no = '".mysqli_real_escape_string($link,$new_contact)."'
+                    WHERE customer_id = '".mysqli_real_escape_string($link,$supplier_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editInventory2($item_id,$new_description,$new_srp){
+    $link = $this->connect();
+    $query=sprintf("UPDATE items
+                    SET item_description = '".mysqli_real_escape_string($link,$new_description)."',
+                    display_srp = '".mysqli_real_escape_string($link,$new_srp)."'
+                    WHERE item_id = '".mysqli_real_escape_string($link,$item_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editExpenses($expense_id,$new_date,$new_payee,$new_amount){
+    $link = $this->connect();
+    $query=sprintf("UPDATE expenses
+                    SET expense_date = '".mysqli_real_escape_string($link,$new_date)."',
+                    payee = '".mysqli_real_escape_string($link,$new_payee)."',
+                    amount = '".mysqli_real_escape_string($link,$new_amount)."'
+                    WHERE expense_id = '".mysqli_real_escape_string($link,$expense_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editReturnItems($return_id,$item_id,$new_quantity,$new_cost){
+    $link = $this->connect();
+    $query=sprintf("UPDATE return_items
+                    SET quantity = '".mysqli_real_escape_string($link,$new_quantity)."',
+                    cost = '".mysqli_real_escape_string($link,$new_cost)."'
+                    WHERE return_id = '".mysqli_real_escape_string($link,$return_id)."' AND item_id = '".mysqli_real_escape_string($link,$item_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editReturns($return_id,$new_date){
+    $link = $this->connect();
+
+    $query=sprintf("UPDATE returns r
+                    INNER JOIN (
+                      SELECT return_id, SUM(quantity * cost) as total
+                      FROM return_items
+                      GROUP BY return_id
+                    ) ri ON r.return_id = '".mysqli_real_escape_string($link,$return_id)."' AND ri.return_id = '".mysqli_real_escape_string($link,$return_id)."'
+                    SET r.total_amount = ri.total,
+                    r.return_date = '".mysqli_real_escape_string($link,$new_date)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editSupplier($supplier_id,$new_name,$new_address,$new_contact){
+    $link = $this->connect();
+    $query=sprintf("UPDATE suppliers
+                    SET supplier_name = '".mysqli_real_escape_string($link,$new_name)."',
+                    address = '".mysqli_real_escape_string($link,$new_address)."',
+                    contact_number = '".mysqli_real_escape_string($link,$new_contact)."'
+                    WHERE supplier_id = '".mysqli_real_escape_string($link,$supplier_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
   public function removeEmpty($supplier_id){
     $link = $this->connect();
     $query=sprintf("DELETE FROM return_empty
@@ -2019,7 +2132,7 @@ public function blankcds($d1,$d2){
             if($row['deposit']) 
               print number_format($row['deposit'],2);
             else print "0"; print"</td>
-      </tr>";
+      <td><a href='#' class='btn btn-primary btn-block showEditCustomer' data-toggle='modal' data-target='#editCustomer' data-id='".$row['customer_id']."' data-name='".$row['customer_name']."' data-address='".$row['address']."' data-contact='".$row['contact_no']."'><b>Edit</b></a></tr>";
     }
     return $data;
   }
@@ -2238,21 +2351,13 @@ public function blankcds($d1,$d2){
 
   public function getInventory(){
     $link = $this->connect();
-    $query = "SELECT i.inv_id,
-                      i.item_id,
+    $query = "SELECT it.item_id,
                       it.item_description,
                       it.display_srp,
-                      sum(i.quantity) as 'quantity',
                       s.supplier_name,
-                      it.supplier_id,
-                      i.trans_date
-              FROM  items it
-              INNER JOIN inventory i
-              ON i.item_id = it.item_id
-              INNER JOIN suppliers s
-              ON s.supplier_id = it.supplier_id
-              GROUP BY i.item_id
-              ORDER BY item_description";
+                      it.supplier_id
+              FROM  items it, suppliers s
+              WHERE it.supplier_id = s.supplier_id";
     $result = mysqli_query ( $link, $query );
     $data = array();
     while($row =mysqli_fetch_assoc($result))
@@ -2612,6 +2717,7 @@ public function blankcds($d1,$d2){
     $link = $this->connect();
     $query = "SELECT p.po_id,
                     i.item_description,
+                    i.item_id,
                     p.quantity,
                     p.cost
               FROM  purchase_order_items p
@@ -2633,12 +2739,18 @@ public function blankcds($d1,$d2){
                     c.customer_name,
                     a.area_name,
                     r.return_date,
-                    r.total_amount
+                    r.total_amount,
+                    ri.quantity,
+                    ri.cost,
+                    ri.item_id
               FROM  returns r
               INNER JOIN customers c
               ON c.customer_id = r.customer_id
               INNER JOIN areas a
               ON a.area_id = c.area_id
+              INNER JOIN return_items ri
+              ON r.return_id = ri.return_id
+
               ORDER BY r.return_date";
     $result = mysqli_query ( $link, $query );
     $data = array();

@@ -19,6 +19,50 @@
         Suppliers
       </h1>
     </section>
+
+    <div class="modal fade" id="editSupplier" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Edit</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Supplier Name
+                </div>
+                <input type="text" class="form-control pull-right" id="new_name" value="0">
+              </div>
+            </div>
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Address
+                </div>
+                <input type="text" class="form-control pull-right" id="new_address" value="0">
+              </div>
+            </div>
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Contact Number
+                </div>
+                <input type="text" class="form-control pull-right" id="new_contact" value="0">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-target='#recordPayment' data-toggle="modal" onclick="editSupplier()">Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Main content -->
     <section class="content">
       <div class="sk-folding-cube" id="loader">
@@ -43,6 +87,7 @@
                   <th>Contact Number</th>
                   <th>Payables</th>
                   <th>Deposit</th>
+                  <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -55,6 +100,7 @@
                   <th>Contact Number</th>
                   <th>Payables</th>
                   <th>Deposit</th>
+                  <th>Action</th>
                 </tr>
                 </tfoot>
               </table>
@@ -73,6 +119,33 @@
   $ui->externalScripts();
 ?>
 <script>
+
+var supplier_id;
+
+function editSupplier(){
+  $.ajax({
+      url: '../gateway/adps.php?op=editSupplier',
+      type: 'post',
+      dataType: 'json',
+      data: {
+        'supplier_id': supplier_id,
+        'new_name': $('#new_name').val(),
+        'new_address': $('#new_address').val(),
+        'new_contact': $('#new_contact').val()
+      },
+      success: function(data){
+        location.reload();
+      }
+    });
+}
+
+$(document).on("click", ".showEditSupplier", function () {
+      supplier_id = $(this).data('id');
+      document.getElementById("new_name").value = $(this).data('name');
+      document.getElementById("new_address").value = $(this).data('address');
+      document.getElementById("new_contact").value = $(this).data('contact');
+    });
+
   $(function () {
     $.ajax({
       url: '../gateway/adps.php?op=getSupplierList',
@@ -91,7 +164,8 @@
                                             "</td><td>"+(supplier.address==null || supplier.address==""  ?"-":supplier.address)+
                                             "</td><td>"+(supplier.contact_number==null || supplier.contact_number==""  ?"-":supplier.contact_number)+
                                             "</td><td>"+parseFloat(supplier.payables[0].payables).toFixed(2)+
-                                            "</td><td>"+parseFloat(dep).toFixed(2)+"</td></tr>");
+                                            "</td><td>"+parseFloat(dep).toFixed(2)+
+                                            "</td><td><a href='#' class='btn btn-primary btn-block showEditSupplier' data-toggle='modal' data-target='#editSupplier' data-id='"+supplier.supplier_id+"' data-name='"+supplier.supplier_name+"' data-address='"+supplier.address+"' data-contact='"+supplier.contact_number+"'><b>Edit</b></a></tr>");
         }
       $('#supplierListTable').dataTable();
       }
