@@ -643,11 +643,12 @@ class adps_functions{
 
   }
 
-  public function editCustomer($supplier_id,$new_name,$new_address,$new_contact){
+  public function editCustomer($supplier_id,$new_name,$new_address,$new_contact,$new_preseller){
     $link = $this->connect();
     $query=sprintf("UPDATE customers
                     SET customer_name = '".mysqli_real_escape_string($link,$new_name)."',
                     address = '".mysqli_real_escape_string($link,$new_address)."',
+                    preseller_id = '".mysqli_real_escape_string($link,$new_preseller)."',
                     contact_no = '".mysqli_real_escape_string($link,$new_contact)."'
                     WHERE customer_id = '".mysqli_real_escape_string($link,$supplier_id)."'");
 
@@ -2114,6 +2115,7 @@ public function blankcds($d1,$d2){
                     c.contact_no,
                     a.area_name,
                     c.record_id,
+                    c.preseller_id,
                     sum(cd.deposit_amount) as deposit
               FROM  customers c
               INNER JOIN areas a
@@ -2151,7 +2153,7 @@ public function blankcds($d1,$d2){
             if($row['deposit']) 
               print number_format($row['deposit'],2);
             else print "0"; print"</td>
-      <td><a href='#' class='btn btn-primary btn-block showEditCustomer' data-toggle='modal' data-target='#editCustomer' data-id='".$row['customer_id']."' data-name='".$row['customer_name']."' data-address='".$row['address']."' data-contact='".$row['contact_no']."'><b>Edit</b></a></tr>";
+      <td><a href='#' class='btn btn-primary btn-block showEditCustomer' data-toggle='modal' data-target='#editCustomer' data-id='".$row['customer_id']."' data-name='".$row['customer_name']."' data-address='".$row['address']."' data-contact='".$row['contact_no']."' data-preseller='".$row['preseller_id']."'><b>Edit</b></a></tr>";
     }
     return $data;
   }
@@ -2959,6 +2961,26 @@ public function blankcds($d1,$d2){
     return $data;
   }
 
+  public function getPresellers(){
+
+    $link = $this->connect();
+    $query = "SELECT preseller_id,
+                    name
+              FROM  presellers
+              ORDER BY name";
+    $result = mysqli_query ( $link, $query );
+    $select= '<select name="presellers" id="presellers"><option selected disabled>Presellers</option>';
+    while($row =mysqli_fetch_assoc($result))
+    {
+        $select.='<option value="'.$row['preseller_id'].'">'.$row['name'].'</option>';
+    }
+
+    $select.='</select>';
+    echo $select;
+
+  }
+
+
   public function getReturnById($return_id){
     $link = $this->connect();
     $query = "SELECT s.return_id,
@@ -3044,6 +3066,7 @@ public function blankcds($d1,$d2){
   public function getReturnItems($return_id){
     $link = $this->connect();
     $query = "SELECT p.ri_id,
+                    p.item_id,
                     i.item_description,
                     p.quantity,
                     p.cost

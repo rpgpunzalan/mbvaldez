@@ -54,6 +54,9 @@
                 <input type="text" class="form-control pull-right" id="new_contact" value="0">
               </div>
             </div>
+            <div class="form-group col-md-12">
+              <?php $db->getPresellers(); ?>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -127,6 +130,11 @@
 var customer_id;
 
   function editCustomer(){
+
+  var e = document.getElementById("presellers");
+  var p = e.options[e.selectedIndex].value;
+  console.log(p);
+
   $.ajax({
       url: '../gateway/adps.php?op=editCustomer',
       type: 'post',
@@ -135,7 +143,8 @@ var customer_id;
         'customer_id': customer_id,
         'new_name': $('#new_name').val(),
         'new_address': $('#new_address').val(),
-        'new_contact': $('#new_contact').val()
+        'new_contact': $('#new_contact').val(),
+        'new_preseller': p
       },
       success: function(data){
         location.reload();
@@ -148,6 +157,18 @@ $(document).on("click", ".showEditCustomer", function () {
       document.getElementById("new_name").value = $(this).data('name');
       document.getElementById("new_address").value = $(this).data('address');
       document.getElementById("new_contact").value = $(this).data('contact');
+
+      var p_id = $(this).data('preseller');
+
+      var mySelect = document.getElementById('presellers');
+
+      for(var i, j = 0; i = mySelect.options[j]; j++) {
+          if(i.value == p_id) {
+              mySelect.selectedIndex = j;
+              break;
+          }
+      }
+
     });
   // $(function () {
   //   $.ajax({

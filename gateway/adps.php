@@ -44,6 +44,13 @@
         echo json_encode(array("status"=>"success","length"=>sizeOf($res),"result"=>$res));
         break;
       }
+
+      case "getPresellers": {
+        $db->getPresellers();
+        echo json_encode(array("status"=>"success"));
+        break;
+      }
+
       case "getSupplierByID": {
 				if(isset($_POST['supplier_id'])){
           $res = $db->getSupplierById($_POST['supplier_id']);
@@ -319,7 +326,7 @@
         if(isset($_POST['customer_id'])){
           /*$record_id = $db->addRecord($_SESSION['user_id']);*/
 
-          $msg = $db->editCustomer($_POST['customer_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact']);
+          $msg = $db->editCustomer($_POST['customer_id'],$_POST['new_name'],$_POST['new_address'],$_POST['new_contact'],$_POST['new_preseller']);
           echo json_encode(array("status"=>$msg));
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;
@@ -573,6 +580,7 @@
 				}
 				break;
 			}
+
 			case "recordDeposit":{
 				if(isset($_GET['dateDeposit'])&&isset($_GET['bankacctDeposit'])&&isset($_GET['amountDeposit'])&&isset($_GET['checknumber'])&&isset($_GET['checkdate'])){
 		      		$res = $db->recordDeposit($_GET['dateDeposit'],$_GET['bankacctDeposit'],$_GET['amountDeposit']);
