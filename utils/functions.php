@@ -675,11 +675,12 @@ class adps_functions{
 
   }
 
-  public function editExpenses($expense_id,$new_date,$new_payee,$new_amount){
+  public function editExpenses($expense_id,$new_date,$new_payee,$new_payee_address,$new_amount){
     $link = $this->connect();
     $query=sprintf("UPDATE expenses
                     SET expense_date = '".mysqli_real_escape_string($link,$new_date)."',
                     payee = '".mysqli_real_escape_string($link,$new_payee)."',
+                    payee_address = '".mysqli_real_escape_string($link,$new_payee_address)."',
                     amount = '".mysqli_real_escape_string($link,$new_amount)."'
                     WHERE expense_id = '".mysqli_real_escape_string($link,$expense_id)."'");
 

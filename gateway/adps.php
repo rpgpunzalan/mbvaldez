@@ -346,7 +346,7 @@
         if(isset($_POST['expense_id'])){
           /*$record_id = $db->addRecord($_SESSION['user_id']);*/
 
-          $msg = $db->editExpenses($_POST['expense_id'],$_POST['new_date'],$_POST['new_payee'],$_POST['new_amount']);
+          $msg = $db->editExpenses($_POST['expense_id'],$_POST['new_date'],$_POST['new_payee'],$_POST['new_payee_address'],$_POST['new_amount']);
           echo json_encode(array("status"=>$msg));
         }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
         break;

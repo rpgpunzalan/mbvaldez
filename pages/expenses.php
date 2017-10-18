@@ -218,6 +218,7 @@ var expense_id;
         'expense_id': expense_id,
         'new_date': $('#new_date').val(),
         'new_payee': $('#new_payee').val(),
+        'new_payee_address': $('#new_payee_address').val(),
         'new_amount': $('#new_amount').val()
       },
       success: function(data){
