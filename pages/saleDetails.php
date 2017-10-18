@@ -22,6 +22,53 @@
         Sale Details - <?php echo $sale_id; ?>
       </h1>
     </section>
+
+    <div class="modal fade" id="editSales" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Edit</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group col-md-12">
+              <label>Date</label>
+
+              <div class="input-group">
+                <div class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </div>
+                <input type="text" class="form-control pull-right" id="new_date">
+              </div>
+              <!-- /.input group -->
+            </div>
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Quantity
+                </div>
+                <input type="text" class="form-control pull-right" id="new_quantity" value="0" onchange="updateTotal()">
+              </div>
+            </div>
+            <div class="form-group col-md-12">
+              <div class="input-group date">
+                <div class="input-group-addon">
+                  Cost
+                </div>
+                <input type="text" class="form-control pull-right" id="new_cost" value="0" onchange="updateTotal()">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-target='#recordPayment' data-toggle="modal" onclick="editSales()">Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Main content -->
     <section class="content">
       <div class="sk-folding-cube" id="loader">
@@ -61,10 +108,11 @@
                   <div class="col-md-12">
                     <table style="margin-top:30px" id="sale_items" class="table">
                       <thead>
-                        <th width="50%">Particulars</th>
+                        <th width="40%">Particulars</th>
                         <th width="10%">Quantity</th>
                         <th width="20%">Amount</th>
                         <th width="20%">Total</th>
+                        <th width="10%">Action</th>
                       </thead>
                       <tbody>
                       </tbody>
@@ -115,7 +163,77 @@
   $ui->externalScripts();
 ?>
 <script>
+
+
+var sale_id;
+var item_id;
+
+function updateTotal(){
+
+  var am = document.getElementById("new_cost").value;
+  var quan = document.getElementById("new_quantity").value;
+
+  var totalnew = am*quan;
+  //console.log(totalnew);
+
+  //document.getElementById("new_totalamount").value = totalnew;
+}
+
+function editSales(){
+
+  //console.log(sale_id + " ----------- " + item_id + " ----------- " + $('#new_quantity').val() + " ----------- " + $('#new_cost').val())
+
+  $.ajax({
+      url: '../gateway/adps.php?op=editSaleItems',
+      type: 'post',
+      dataType: 'json',
+      data: {
+        'sale_id': sale_id,
+        'item_id': item_id,
+        'new_quantity': $('#new_quantity').val(),
+        'new_cost': $('#new_cost').val()
+      },
+      success: function(data){
+        $.ajax({
+          url: '../gateway/adps.php?op=editSales',
+          type: 'post',
+          dataType: 'json',
+          data: {
+            'sale_id': sale_id,
+            'new_date': $('#new_date').val()
+          },
+          success: function(data){
+            console.log("hi");
+            location.reload();
+          }
+        });
+      }
+    });
+
+    
+}
+
+$(document).ready(function(){
+
+    $('#new_date').datepicker({
+        format: 'yyyy-mm-dd'
+    });
+
+});
+
+$(document).on("click", ".showEditSales", function () {
+      sale_id = $(this).data('id');
+      item_id = $(this).data('id2');
+      document.getElementById("new_date").value = $(this).data('date');
+      document.getElementById("new_cost").value = $(this).data('cost');
+      document.getElementById("new_quantity").value = $(this).data('quantity');
+    });
+
+
   $(function () {
+
+    var saleDate;
+
     $.ajax({
       url: '../gateway/adps.php?op=getSaleById',
       type: 'get',
@@ -128,6 +246,9 @@
         $('#sale_items tbody').html("");
         $.each(data.result, function(i,saleDetail)
         {
+
+          saleDate = saleDetail.sale_date;
+          sale_id = saleDetail.sale_id;
 
           $('#customer').html(saleDetail.customer_name);
           $('#po_date').html(saleDetail.sale_date);
@@ -153,7 +274,8 @@
                                             "<tr><td>"+item.item_description+
                                             "</td><td>"+item.quantity+
                                             "</td><td>"+parseFloat(item.amount).toFixed(2)+
-                                            "</td><td>"+(item.quantity*item.amount).toFixed(2)+"</td></tr>");
+                                            "</td><td>"+(item.quantity*item.amount).toFixed(2)+
+                                            "</td><td><a href='#' class='btn btn-primary btn-block showEditSales' data-toggle='modal' data-target='#editSales' data-id='"+sale_id+"' data-id2='"+item.item_id+"' data-date='"+saleDate+"' data-quantity='"+item.quantity+"' data-cost='"+item.amount+"'><b>Edit</b></a></tr>");
         });
       }
     });

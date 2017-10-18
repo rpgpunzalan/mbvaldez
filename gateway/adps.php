@@ -373,6 +373,28 @@
         break;
       }
 
+      case "editSaleItems":{
+
+        if(isset($_POST['sale_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editSaleItems($_POST['sale_id'],$_POST['item_id'],$_POST['new_quantity'],$_POST['new_cost']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
+      case "editSales":{
+
+        if(isset($_POST['sale_id'])){
+          /*$record_id = $db->addRecord($_SESSION['user_id']);*/
+
+          $msg = $db->editSales($_POST['sale_id'],$_POST['new_date']);
+          echo json_encode(array("status"=>$msg));
+        }else echo json_encode(array("status"=>"failed", "message"=>"check parameters"));
+        break;
+      }
+
       case "editSupplier":{
 
         if(isset($_POST['supplier_id'])){

@@ -706,6 +706,21 @@ class adps_functions{
 
   }
 
+  public function editSaleItems($sale_id,$item_id,$new_quantity,$new_cost){
+    $link = $this->connect();
+    $query=sprintf("UPDATE sale_items
+                    SET quantity = '".mysqli_real_escape_string($link,$new_quantity)."',
+                    amount = '".mysqli_real_escape_string($link,$new_cost)."'
+                    WHERE sale_id = '".mysqli_real_escape_string($link,$sale_id)."' AND item_id = '".mysqli_real_escape_string($link,$item_id)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
   public function editReturns($return_id,$new_date){
     $link = $this->connect();
 
@@ -717,6 +732,26 @@ class adps_functions{
                     ) ri ON r.return_id = '".mysqli_real_escape_string($link,$return_id)."' AND ri.return_id = '".mysqli_real_escape_string($link,$return_id)."'
                     SET r.total_amount = ri.total,
                     r.return_date = '".mysqli_real_escape_string($link,$new_date)."'");
+
+    if (!mysqli_query($link, $query)) {
+        $ret = array("status"=>"failed","message"=>mysqli_error($link));
+    }else $ret = array("status"=>"success");
+
+    return $ret;
+
+  }
+
+  public function editSales($sale_id,$new_date){
+    $link = $this->connect();
+
+    $query=sprintf("UPDATE sales s
+                    INNER JOIN (
+                      SELECT sale_id, SUM(quantity * amount) as total
+                      FROM sale_items
+                      GROUP BY sale_id
+                    ) si ON s.sale_id = '".mysqli_real_escape_string($link,$sale_id)."' AND si.sale_id = '".mysqli_real_escape_string($link,$sale_id)."'
+                    SET s.total_amount = si.total - s.discount,
+                    s.sale_date = '".mysqli_real_escape_string($link,$new_date)."'");
 
     if (!mysqli_query($link, $query)) {
         $ret = array("status"=>"failed","message"=>mysqli_error($link));
@@ -3033,6 +3068,8 @@ public function blankcds($d1,$d2){
   public function getSaleItems($sale_id){
     $link = $this->connect();
     $query = "SELECT p.si_id,
+                    p.item_id,
+                    p.sale_id,
                     i.item_description,
                     p.quantity,
                     p.amount
